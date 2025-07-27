@@ -1,21 +1,48 @@
-name: Hello, World!
-description: Greet someone and record the time
-author: GitHub Actions
+name: i18n-agent-action
+description: i18n agent
+author: SamYuan1990
 
 # Define your inputs here.
 inputs:
-  who-to-greet:
-    description: Who to greet
+  apikey:
+    description: apikey to LLM service
     required: true
-    default: World
-
-# Define your outputs here.
-outputs:
-  time:
-    description: The time we greeted you
+  RESERVED_WORD:
+    description: RESERVED_WORD you want to keep
+    required: true
+  DOCS_FOLDER:
+    description: your documentation folder
+    required: true
+  CONFIG_FILE:
+    description: configuration file as your project i18n setting
+    required: true
+  FILE_LIST:
+    description: apikey to LLM service
+  workspace:
+    description: workspace to your code repo
+    required: true   
 
 runs:
-  using: docker
-  image: Dockerfile
-  env:
-    INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
+  using: 'composite'
+  steps:
+    - name: Set up Docker as container env
+      uses: docker/setup-buildx-action@v3
+    - name: run local dev script
+      shell: bash
+      id: local-dev
+      run: |
+        # 基础命令部分
+        DOCKER_CMD="docker run \
+          -v ${{ inputs.workspace }}:/workspace \
+          -e api_key=${{ inputs.apikey }} \
+          -e CONFIG_FILE=${{ inputs.CONFIG_FILE }} \
+          -e DOCS_FOLDER=${{ inputs.DOCS_FOLDER }} \
+          -e RESERVED_WORD=${{ inputs.RESERVED_WORD }}"
+
+        # 如果提供了 FILE_LIST 则添加该参数
+        if [ -n "${{ inputs.FILE_LIST }}" ]; then
+          DOCKER_CMD="$DOCKER_CMD -e FILE_LIST=${{ inputs.FILE_LIST }}"
+        fi
+        # 添加镜像名称并执行
+        DOCKER_CMD="$DOCKER_CMD ghcr.io/samyuan1990/i18n-agent-action:latest"
+        eval $DOCKER_CMDghcr.io/samyuan1990/i18n-agent-action:latest

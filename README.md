@@ -44,7 +44,7 @@ As for me, I can't parallel in https://github.com/sustainable-computing-io/keple
 > Don't want to rebuild the wheel. as there are PR actions already to open PR for change.
 
 ## Usage
-to be specific, but considering with 12 factors agent, it supports local run and running in CI.
+to be specific, but considering with 12 factors agent, it supports local run in terminal, container or CI.
 
 ### manual
 ```
@@ -72,8 +72,9 @@ docker run -it \
   -e DOCS_FOLDER="/workspace/docs" \
   -e RESERVED_WORD="kepler" \
   -e FILE_LIST="/workspace/docs/index.md" \
-  i18n-agent-action:latest
+  ghcr.io/samyuan1990/i18n-agent-action:latest
 ```
+### GHA
 
 
 ## Inputs
