@@ -43,7 +43,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/SamYuan1990/i18n-agent-action
+          tags: ghcr.io/samyuan1990/i18n-agent-action
           labels: latest
           file: ./Dockerfile
 
