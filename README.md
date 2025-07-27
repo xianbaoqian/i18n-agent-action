@@ -48,10 +48,10 @@ to be specific, but considering with 12 factors agent, it supports local run and
 
 ### manual
 ```
-pip3 install OpenAI
+pip3 install...
 export api_key={your_key}
-//python3 main.py {your config file} {your docs folder} {Reserved Word}
-python3 main.py {full_path_to_your_repo}/mkdocs.yml {full_path_to_your_repo}/docs kepler
+//python3 main.py {your config file} {your docs folder} {Reserved Word} {optional if you have a file list}
+python3 main.py {full_path_to_your_repo}/mkdocs.yml {full_path_to_your_repo}/docs kepler {optional if you have a file list}
 ```
 and you shoud run linting by your self
 ```
@@ -68,15 +68,15 @@ docker run \
 - Config file
 - LLM service endpoint and API key
 - Run model(to be specific)
-- Specific file(in case of LLM missing a file)
-- Specific file output(in case of LLM missing a file)
+- Specific file path(in case of LLM missing a path)
+- Reserved word
+- Optional Specific file if you have a file list
 
 ## Outputs
 - Files.
-- Trace Logs.
+- Trace Logs, in console
 
 ## Adption communtiy/project
 - kepler
 
-## Test Locally
-to be specific
+## Test Locally same as usage.manual
