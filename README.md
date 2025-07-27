@@ -53,6 +53,16 @@ export api_key={your_key}
 //python3 main.py {your config file} {your docs folder} {Reserved Word}
 python3 main.py {full_path_to_your_repo}/mkdocs.yml {full_path_to_your_repo}/docs kepler
 ```
+and you shoud run linting by your self
+```
+docker run \
+  -e LOG_LEVEL=DEBUG \
+  -e RUN_LOCAL=true \
+  -e FIX_MARKDOWN=true \
+  -v {full_path_to_your_repo}:/tmp/lint \
+  --rm \
+  ghcr.io/super-linter/super-linter:latest
+```
 
 ## Inputs
 - Config file

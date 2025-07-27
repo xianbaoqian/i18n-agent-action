@@ -1,0 +1,26 @@
+prompts:
+  config_analysis: "
+    according to config file below, 
+    - which i18n does the project cover? 
+    - what's the naming rule or file path rule for i18n mapping between different language edition? \n
+    "
+  json_schema: 'please result in mapping as source file, support file.
+    the empty json schema is
+    {
+    "todo":[],
+    }
+    if there one object in json
+    {
+    "todo":[
+    {
+    "source_file": "/path_to_file",
+    "target_file":"/path_to_file_i18n",
+    "target_language":"zh"
+    }
+    ],
+    }'
+  
+  
+
+
+
