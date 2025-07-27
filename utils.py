@@ -82,18 +82,20 @@ def extract_json_from_text(text):
         None: 如果未找到有效的 JSON
     """
     # 使用正则表达式匹配 JSON 部分（从第一个 { 到最后一个 }）
-    json_pattern = r'\{[\s\S]*\}'
-    match = re.search(json_pattern, text)
+    # re.search(r'```json\n(.*?)\n```', text, re.DOTALL)
+    json_pattern = r'```json\n(.*?)\n```'
+    match = re.search(json_pattern, text, re.DOTALL)
     
     if not match:
         return None
     
-    json_str = match.group(0)
+    json_str = match.group(1)
     
     try:
         # 尝试解析 JSON
+        log(json_str)
         json_data = json.loads(json_str)
         return json_data
     except json.JSONDecodeError as e:
-        print(f"JSON 解析错误: {e}")
+        log(f"JSON 解析错误: {e}")
         return None

@@ -32,7 +32,7 @@ json_todo_list = missingfiles(configfile_path, doc_folder,config,api_key,base_ur
 flowtwo(json_todo_list, api_key,base_url, model, reserved_word, doc_folder, False)
 ## Workflow 2 
 ### Phase 1
-if len(args) >=4:
+if len(args) >4:
     file_list = args[4]
     log(file_list)
     json_todo_list = givenfiles(configfile_path,file_list,config,api_key,base_url,model)

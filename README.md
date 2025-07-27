@@ -63,6 +63,18 @@ docker run \
   --rm \
   ghcr.io/super-linter/super-linter:latest
 ```
+### container
+```
+docker run -it \
+  -v /path_to_repo.../kepler-doc:/workspace \
+  -e api_key="" \
+  -e CONFIG_FILE="/workspace/mkdocs.yml" \
+  -e DOCS_FOLDER="/workspace/docs" \
+  -e RESERVED_WORD="kepler" \
+  -e FILE_LIST="/workspace/docs/index.md" \
+  i18n-agent-action:latest
+```
+
 
 ## Inputs
 - Config file
