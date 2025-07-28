@@ -49,10 +49,19 @@ jobs:
       - name: Run the Container
         id: run
         env:
-          INPUT_WHO_TO_GREET: Mona Lisa Octocat
+          apikey: ""
+          RESERVED_WORD: ""
+          DOCS_FOLDER: ""
+          CONFIG_FILE: ""
+          FILE_LIST: ""
+          workspace: ""
+          dryRun: true
         run: |
           docker run \
-            --env INPUT_WHO_TO_GREET="${{ env.INPUT_WHO_TO_GREET }}" \
+            -e api_key=${{ inputs.apikey }} \
+            -e dryRun=${{ inputs.dryRun }} \
+            -e CONFIG_FILE=${{ inputs.CONFIG_FILE }} \
+            -e DOCS_FOLDER=${{ inputs.DOCS_FOLDER }} \
             --rm ${{ env.TEST_TAG }}
 
   test-action:
@@ -68,7 +77,13 @@ jobs:
         id: test-action
         uses: ./
         with:
-          who-to-greet: Mona Lisa Octocat
+          apikey: ""
+          RESERVED_WORD: ""
+          DOCS_FOLDER: ""
+          CONFIG_FILE: ""
+          FILE_LIST: ""
+          workspace: ""
+          dryRun: true
 
       - name: Print Output
         id: output
