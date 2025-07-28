@@ -33,6 +33,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_MARKDOWN: true
+          VALIDATE_MARKDOWN_PRETTIER: true
+          VALIDATE_PYTHON_RUFF: true
+          VALIDATE_PYTHON_ISORT: true
+          VALIDATE_PYTHON_BLACK: true
 
   fix-lint-issues:
     permissions:
@@ -52,9 +56,15 @@ jobs:
           # Set your fix mode variables to true
           FIX_MARKDOWN: true
           FIX_MARKDOWN_PRETTIER: true
+          FIX_PYTHON_RUFF: true
+          FIX_PYTHON_ISORT: true
+          FIX_PYTHON_BLACK: true
           VALIDATE_MARKDOWN: true
           VALIDATE_MARKDOWN_PRETTIER: true
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_PYTHON_RUFF: true
+          VALIDATE_PYTHON_ISORT: true
+          VALIDATE_PYTHON_BLACK: true
           # To reuse the same Super-linter configuration that you use in the
           # lint job without duplicating it, see
           # https://github.com/super-linter/super-linter/blob/main/docs/run-linter-locally.md#share-environment-variables-between-environments
