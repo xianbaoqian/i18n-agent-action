@@ -7,6 +7,16 @@
 It was discussed on KCD 2025 BeiJing, Community Over Code 2025 China and we finally dicede to make an agent to handle i18n works for community.
 As for me, I can't parallel in https://github.com/sustainable-computing-io/kepler-doc/issues/175 and Community Over Code 2025's session.
 
+## UX todo
+- [ ] document this repo itself and publish on github
+- [ ] self i18n works as living demo and test base with dryRun
+- [ ] dryRun option
+- [ ] report as how many docs, tokens been used
+
+## Tech todo
+- [ ] phase 1 into run model
+- [ ] refactor LLM talk and client creation
+
 ## In scope and not in scope, and how it works.
 
 > Don't want to rebuild the wheel.
@@ -53,16 +63,8 @@ export api_key={your_key}
 //python3 main.py {your config file} {your docs folder} {Reserved Word} {optional if you have a file list}
 python3 main.py {full_path_to_your_repo}/mkdocs.yml {full_path_to_your_repo}/docs kepler {optional if you have a file list}
 ```
-and you shoud run linting by your self
-```
-docker run \
-  -e LOG_LEVEL=DEBUG \
-  -e RUN_LOCAL=true \
-  -e FIX_MARKDOWN=true \
-  -v {full_path_to_your_repo}:/tmp/lint \
-  --rm \
-  ghcr.io/super-linter/super-linter:latest
-```
+and you shoud run linting by yourself.
+
 ### container
 ```
 docker run -it \

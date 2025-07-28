@@ -3,6 +3,51 @@ import subprocess
 import re
 import json
 import os
+import sys
+
+def validate_inputs(args):
+    """
+    验证并处理输入参数，提供灵活的参数检测
+    
+    参数:
+        args (list): 命令行参数列表
+        
+    返回:
+        tuple: (configfile_path, doc_folder, reserved_word)
+        
+    异常:
+        ValueError: 当参数无效时抛出
+    """
+    # 参数数量检查
+    if len(args) < 4:
+        raise ValueError("需要3个参数: 配置文件路径、文档文件夹路径和保留字")
+    
+    # 获取参数
+    configfile_path = args[1].strip() if len(args) > 1 else None
+    doc_folder = args[2].strip() if len(args) > 2 else None
+    reserved_word = args[3].strip() if len(args) > 3 else None
+    
+    # 配置文件路径验证
+    if not configfile_path:
+        raise ValueError("配置文件路径不能为空")
+    
+    # 检查配置文件是否存在（如果需要）
+    if not os.path.isfile(configfile_path):
+        raise ValueError(f"配置文件不存在: {configfile_path}")
+    
+    # 文档文件夹路径验证
+    if not doc_folder:
+        raise ValueError("文档文件夹路径不能为空")
+    
+    # 检查文档文件夹是否存在（如果需要）
+    if not os.path.isdir(doc_folder):
+        raise ValueError(f"文档文件夹不存在: {doc_folder}")
+    
+    # 保留字验证
+    #if not reserved_word:
+    #    raise ValueError("保留字不能为空")
+    
+    return configfile_path, doc_folder, reserved_word
 
 def log(msg):
     print(msg)
@@ -13,9 +58,18 @@ def log(msg):
 def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
     """ 判断是否需要刷新文件 """
     return force_refresh or not os.path.isfile(target_file)
+
+def talk_to_LLM(client, model, messages):
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        stream=False
+    )
+    return response
+
 # 定义处理函数
 #### todo if there is a existing file, then skip
-def translate_element(api_key,base_url,model,reserved_word,doc_folder,element, force_refresh: bool = True):
+def translate_element(reserved_word,doc_folder,element, clientInfo, force_refresh: bool = True):
     log(f"processing: {element}")
 
     source_file = element['source_file']
@@ -38,18 +92,14 @@ def translate_element(api_key,base_url,model,reserved_word,doc_folder,element, f
     with open(source_file, 'r', encoding='utf-8') as file:
         file_content = file.read()  # 读取全部内容为字符串
     # in this turn, we just use one short to translate the files
-    client = OpenAI(api_key=api_key, base_url=base_url)
-
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
+    client = OpenAI(api_key=clientInfo.get_api_key(), base_url=clientInfo.get_base_url())
+    messages=[
             {"role": "system", "content": "You are a senior translators"},
             {"role": "user", "content": """
             please help translate content below into """ + target_language + """ for me, please keep """ + reserved_word + """ in english and keep the markdown style, here is the content: \n
             """ + file_content},
-        ],
-        stream=False
-    )
+    ]
+    response = talk_to_LLM(client, clientInfo.get_model(),messages)
     output_content = response.choices[0].message.content
     log('translated '+target_file)
     with open(target_file, 'w', encoding='utf-8') as file:
