@@ -1,6 +1,6 @@
 # Why we have this
 It was discussed on KCD 2025 BeiJing, Community Over Code 2025 China and we finally dicede to make an agent to handle i18n works for community.
-As for me, I can't parallel in https://github.com/sustainable-computing-io/kepler-doc/issues/175 and Community Over Code 2025's session.
+As for me, I can't parallel in [https://github.com/sustainable-computing-io/kepler-doc/issues/175](https://github.com/sustainable-computing-io/kepler-doc/issues/175) and Community Over Code 2025's session.
 
 ## Try with my own Principles of Agent Development
 
@@ -26,11 +26,13 @@ and you shoud run linting by yourself.
 ### Container
 ```
 docker run -it \
-  -v /path_to_repo.../kepler-doc:/workspace \
-  -e api_key="" \
+  -v path_to_your_repo:/workspace \
+  -e model="deepseek-chat" \
+  -e base_url="https://api.deepseek.com" \
+  -e api_key="..." \
   -e CONFIG_FILE="/workspace/mkdocs.yml" \
   -e DOCS_FOLDER="/workspace/docs" \
-  -e RESERVED_WORD="kepler" \
+  -e RESERVED_WORD="i18n-agent-action" \
   -e FILE_LIST="/workspace/docs/index.md" \
   ghcr.io/samyuan1990/i18n-agent-action:latest
 ```

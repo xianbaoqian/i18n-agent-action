@@ -12,6 +12,9 @@ permissions:
   contents: read
 
 jobs:
+  #test-python:
+  #  name: python Test
+  #  runs-on: ubuntu-latest
   test-docker:
     name: Docker Tests
     runs-on: ubuntu-latest

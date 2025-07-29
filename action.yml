@@ -7,6 +7,10 @@ inputs:
   apikey:
     description: apikey to LLM service
     required: true
+  base_url:
+    description: LLM service endpoint
+  model:
+    description: LLM service model
   RESERVED_WORD:
     description: RESERVED_WORD you want to keep
     required: true
@@ -46,6 +50,12 @@ runs:
         if [ -n "${{ inputs.FILE_LIST }}" ]; then
           DOCKER_CMD="$DOCKER_CMD -e FILE_LIST=${{ inputs.FILE_LIST }}"
         fi
+        if [ -n "${{ inputs.base_url }}" ]; then
+          DOCKER_CMD="$DOCKER_CMD  -e base_url=${{ inputs.base_url }}"
+        fi    
+        if [ -n "${{ inputs.model }}" ]; then
+          DOCKER_CMD="$DOCKER_CMD -e model=${{ inputs.model }}"
+        fi    
         # 添加镜像名称并执行
         DOCKER_CMD="$DOCKER_CMD ghcr.io/samyuan1990/i18n-agent-action:latest"
         eval $DOCKER_CMD

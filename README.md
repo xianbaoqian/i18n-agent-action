@@ -64,11 +64,13 @@ python3 main.py ./mkdocs.yml ./docs i18n-agent-action ./docs/index.md
 ### Container
 ```
 docker run -it \
-  -v /path_to_repo.../kepler-doc:/workspace \
-  -e api_key="" \
+  -v path_to_your_repo:/workspace \
+  -e model="deepseek-chat" \
+  -e base_url="https://api.deepseek.com" \
+  -e api_key="..." \
   -e CONFIG_FILE="/workspace/mkdocs.yml" \
   -e DOCS_FOLDER="/workspace/docs" \
-  -e RESERVED_WORD="kepler" \
+  -e RESERVED_WORD="i18n-agent-action" \
   -e FILE_LIST="/workspace/docs/index.md" \
   ghcr.io/samyuan1990/i18n-agent-action:latest
 ```
