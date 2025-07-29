@@ -54,11 +54,11 @@ jobs:
         run: |
           DOCKER_CMD="docker run \
           -v /home/runner/work/i18n-agent-action/i18n-agent-action:/workspace \
-          -e api_key="dummy" \
+          -e api_key=dummy \
           -e dryRun=True \
-          -e CONFIG_FILE="/workspace/mkdocs.yml" \
-          -e DOCS_FOLDER="/workspace/docs" \
-          -e RESERVED_WORD="i18n-agent-action"
+          -e CONFIG_FILE=/workspace/mkdocs.yml \
+          -e DOCS_FOLDER=/workspace/docs \
+          -e RESERVED_WORD=i18n-agent-action
 
           # 添加镜像名称并执行
           DOCKER_CMD="$DOCKER_CMD localhost:5001/actions/i18n-agent-action:latest"
