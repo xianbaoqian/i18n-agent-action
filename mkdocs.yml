@@ -1,0 +1,16 @@
+site_name: i18n-agent-action
+theme: material
+
+docs_dir: ./docs
+
+plugins:
+  - i18n:
+      docs_structure: suffix
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: zh
+          name: Chinese
+          build: true
