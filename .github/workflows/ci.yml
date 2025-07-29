@@ -83,7 +83,3 @@ jobs:
           CONFIG_FILE: /workspace/mkdocs.yml
           workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
           dryRun: True
-
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.time }}"

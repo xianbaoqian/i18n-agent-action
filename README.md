@@ -6,7 +6,6 @@
 
 ## UX todo
 - [ ] self i18n works as living demo and test base with dryRun
-- [ ] dryRun option
 - [ ] report as how many docs, tokens been used
 
 ## Tech todo
