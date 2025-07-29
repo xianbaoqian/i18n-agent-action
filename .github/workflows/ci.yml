@@ -51,11 +51,9 @@ jobs:
 
       - name: Run the Container
         id: run
-        env:
-          INPUT_WHO_TO_GREET: Mona Lisa Octocat
         run: |
           DOCKER_CMD="docker run \
-          -v /home/runner/work/i18n-agent-action:/workspace \
+          -v /home/runner/work/i18n-agent-action/i18n-agent-action:/workspace \
           -e api_key="dummy" \
           -e dryRun=True \
           -e CONFIG_FILE="/workspace/mkdocs.yml" \
@@ -83,7 +81,7 @@ jobs:
           RESERVED_WORD: i18n-agent-action
           DOCS_FOLDER: /workspace/docs
           CONFIG_FILE: /workspace/mkdocs.yml
-          workspace: /home/runner/work/i18n-agent-action
+          workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
           dryRun: True
 
       - name: Print Output
