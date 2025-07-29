@@ -58,7 +58,7 @@ jobs:
           -e dryRun=True \
           -e CONFIG_FILE=/workspace/mkdocs.yml \
           -e DOCS_FOLDER=/workspace/docs \
-          -e RESERVED_WORD=i18n-agent-action
+          -e RESERVED_WORD=i18n-agent-action"
 
           # 添加镜像名称并执行
           DOCKER_CMD="$DOCKER_CMD localhost:5001/actions/i18n-agent-action:latest"
