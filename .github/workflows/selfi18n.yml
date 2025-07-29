@@ -28,7 +28,7 @@ jobs:
           workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           title: "auto i18n with GHA"
           body: "This PR do i18n for you"
