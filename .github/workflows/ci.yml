@@ -57,7 +57,7 @@ jobs:
           -e api_key="dummy" \
           -e dryRun=True \
           -e CONFIG_FILE="/workspace/mkdocs.yml" \
-          -e DOCS_FOLDER="/workspace/docs \
+          -e DOCS_FOLDER="/workspace/docs" \
           -e RESERVED_WORD="i18n-agent-action"
 
           # 添加镜像名称并执行
