@@ -17,7 +17,7 @@ jobs:
         id: test-action
         uses: samyuan1990/i18n-agent-action@latest
         with:
-          apikey: ${{ secert.api_key }}
+          apikey: ${{ secrets.API_KEY }}
           RESERVED_WORD: i18n-agent-action
           DOCS_FOLDER: /workspace/docs
           CONFIG_FILE: /workspace/mkdocs.yml
