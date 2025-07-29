@@ -31,8 +31,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Set up Docker as container env
-      uses: docker/setup-buildx-action@v3
     - name: run local dev script
       shell: bash
       id: local-dev

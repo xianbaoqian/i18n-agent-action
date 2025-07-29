@@ -14,7 +14,13 @@ class clientInfo:
         self._api_key = api_key
         self._base_url = base_url
         self._model = model
-        self._dryRun = dryRun
+        # 鲁棒性处理dryRun参数
+        if isinstance(dryRun, str):
+            self._dryRun = dryRun.lower() == "true"
+        elif isinstance(dryRun, int):
+            self._dryRun = bool(dryRun)
+        else:
+            self._dryRun = bool(dryRun)
         if not self._dryRun:
            self._client = OpenAI(api_key=self._api_key, 
                                 base_url=self._base_url)

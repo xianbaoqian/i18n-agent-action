@@ -19,6 +19,13 @@ def missingfiles(configfile_path,doc_folder,config, clientInfo):
         config['prompts']['config_analysis'] +
         config_file_content}
     )
+    if clientInfo.get_dryRun():
+        log("dry Run model using cache")
+        return {"todo":[{
+            "source_file": "/workspace/docs/index.md",
+            "target_file": "/workspace/docs/index.zh.md",
+            "target_language": "zh"
+        }]}
     response1 = clientInfo.talk_to_LLM(messages)
     answer1 = response1.choices[0].message.content
     log("问题1 回答:" + answer1)
@@ -51,7 +58,13 @@ def givenfiles(configfile_path,file_list,config,clientInfo):
         config['prompts']['config_analysis'] +
         config_file_content}
     )
-
+    if clientInfo.get_dryRun():
+        log("dry Run model using cache")
+        return {"todo":[{
+            "source_file": "/workspace/docs/index.md",
+            "target_file": "/workspace/docs/index.zh.md",
+            "target_language": "zh"
+        }]}
     response1 = clientInfo.talk_to_LLM(messages)
     answer1 = response1.choices[0].message.content
     log("问题1 回答:" + answer1)
