@@ -20,7 +20,9 @@ inputs:
     description: apikey to LLM service
   workspace:
     description: workspace to your code repo
-    required: true   
+    required: true  
+  dryRun:
+    description: dryRun Option
 
 runs:
   using: 'composite'
@@ -35,6 +37,7 @@ runs:
         DOCKER_CMD="docker run \
           -v ${{ inputs.workspace }}:/workspace \
           -e api_key=${{ inputs.apikey }} \
+          -e dryRun=${{ inputs.dryRun }} \
           -e CONFIG_FILE=${{ inputs.CONFIG_FILE }} \
           -e DOCS_FOLDER=${{ inputs.DOCS_FOLDER }} \
           -e RESERVED_WORD=${{ inputs.RESERVED_WORD }}"
@@ -45,4 +48,4 @@ runs:
         fi
         # 添加镜像名称并执行
         DOCKER_CMD="$DOCKER_CMD ghcr.io/samyuan1990/i18n-agent-action:latest"
-        eval $DOCKER_CMDghcr.io/samyuan1990/i18n-agent-action:latest
+        eval $DOCKER_CMD
