@@ -6,11 +6,11 @@ docs_dir: ./docs
 plugins:
   - i18n:
       docs_structure: suffix
-      default_language: en
-      languages:  # 改回列表格式
-        - locale: en
+      default_language: en  # 添加默认语言设置
+      languages:  # 改为字典格式
+        en:
           name: English
           build: true
-        - locale: zh
+        zh:
           name: Chinese
           build: true
