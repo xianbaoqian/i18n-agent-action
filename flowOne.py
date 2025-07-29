@@ -7,8 +7,6 @@ def missingfiles(configfile_path,doc_folder,config, clientInfo):
     with open(configfile_path, 'r', encoding='utf-8') as file:
         config_file_content = file.read()  # 读取全部内容为字符串
 
-    client = OpenAI(api_key=clientInfo.get_api_key(), base_url=clientInfo.get_base_url())
-
     log(doc_folder)
     tree_list = get_tree_output(doc_folder)
 
@@ -21,7 +19,7 @@ def missingfiles(configfile_path,doc_folder,config, clientInfo):
         config['prompts']['config_analysis'] +
         config_file_content}
     )
-    response1 = talk_to_LLM(client, clientInfo.get_model(),messages)
+    response1 = clientInfo.talk_to_LLM(messages)
     answer1 = response1.choices[0].message.content
     log("问题1 回答:" + answer1)
     messages.append({"role": "assistant", "content": answer1})
@@ -33,7 +31,7 @@ def missingfiles(configfile_path,doc_folder,config, clientInfo):
     could you please list the missing file in support language?  \n
     """ + config['prompts']['json_schema']
     })
-    response2 = talk_to_LLM(client, clientInfo.get_model(),messages)
+    response2 = clientInfo.talk_to_LLM(messages)
     log("问题2 回答:" + response2.choices[0].message.content)
     json_todo_list=extract_json_from_text(response2.choices[0].message.content)
     log(len(json_todo_list["todo"]))
@@ -44,9 +42,6 @@ def missingfiles(configfile_path,doc_folder,config, clientInfo):
 def givenfiles(configfile_path,file_list,config,clientInfo):
     with open(configfile_path, 'r', encoding='utf-8') as file:
         config_file_content = file.read()  # 读取全部内容为字符串
-
-    client = OpenAI(api_key=clientInfo.get_api_key(), base_url=clientInfo.get_base_url())
-
     messages = [
         {"role": "system", "content": "You are a senior software engineer"}
     ]
@@ -57,7 +52,7 @@ def givenfiles(configfile_path,file_list,config,clientInfo):
         config_file_content}
     )
 
-    response1 = talk_to_LLM(client, clientInfo.get_model(),messages)
+    response1 = clientInfo.talk_to_LLM(messages)
     answer1 = response1.choices[0].message.content
     log("问题1 回答:" + answer1)
     messages.append({"role": "assistant", "content": answer1})
@@ -68,7 +63,7 @@ def givenfiles(configfile_path,file_list,config,clientInfo):
     here are the file list. \n
     """ + file_list
     })
-    response2 = talk_to_LLM(client, clientInfo.get_model(),messages)
+    response2 = clientInfo.talk_to_LLM(messages)
     log("问题2 回答:" + response2.choices[0].message.content)
     json_todo_list=extract_json_from_text(response2.choices[0].message.content)
     log(len(json_todo_list["todo"]))

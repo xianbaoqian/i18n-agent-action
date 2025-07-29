@@ -1,3 +1,5 @@
+from openai import OpenAI
+
 class clientInfo:
     def __init__(self, api_key=None, base_url="https://api.example.com", model="gpt-4", dryRun=False):
         """
@@ -13,6 +15,12 @@ class clientInfo:
         self._base_url = base_url
         self._model = model
         self._dryRun = dryRun
+        if not self._dryRun:
+           self._client = OpenAI(api_key=self._api_key, 
+                                base_url=self._base_url)
+        else:
+           self._client = None
+
     
     # Getter方法
     def get_api_key(self):
@@ -38,3 +46,14 @@ class clientInfo:
         print(f"  Base URL: {self._base_url}")
         print(f"  Model: {self._model}")
         print(f"  Dry Run: {self._dryRun}")
+
+    def talk_to_LLM(self, messages):
+        if not self._dryRun:
+            response = self._client.chat.completions.create(
+                model=self._model,
+                messages=messages,
+                stream=False
+            )
+            return response
+        else: 
+            return None

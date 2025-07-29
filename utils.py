@@ -1,4 +1,3 @@
-from openai import OpenAI
 import subprocess
 import re
 import json
@@ -58,15 +57,6 @@ def log(msg):
 def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
     """ 判断是否需要刷新文件 """
     return force_refresh or not os.path.isfile(target_file)
-
-def talk_to_LLM(client, model, messages):
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        stream=False
-    )
-    return response
-
 # 定义处理函数
 #### todo if there is a existing file, then skip
 def translate_element(reserved_word,doc_folder,element, clientInfo, force_refresh: bool = True):
@@ -92,14 +82,13 @@ def translate_element(reserved_word,doc_folder,element, clientInfo, force_refres
     with open(source_file, 'r', encoding='utf-8') as file:
         file_content = file.read()  # 读取全部内容为字符串
     # in this turn, we just use one short to translate the files
-    client = OpenAI(api_key=clientInfo.get_api_key(), base_url=clientInfo.get_base_url())
     messages=[
             {"role": "system", "content": "You are a senior translators"},
             {"role": "user", "content": """
             please help translate content below into """ + target_language + """ for me, please keep """ + reserved_word + """ in english and keep the markdown style, here is the content: \n
             """ + file_content},
     ]
-    response = talk_to_LLM(client, clientInfo.get_model(),messages)
+    response = clientInfo.talk_to_LLM(messages)
     output_content = response.choices[0].message.content
     log('translated '+target_file)
     with open(target_file, 'w', encoding='utf-8') as file:
