@@ -1,0 +1,33 @@
+name: Manual i8n and PR Creation
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  i8n-and-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || 'main' }}  # 使用当前分支或main分支
+          fetch-depth: 0  # 获取所有历史记录以便创建分支
+
+      - name: Test Local Action
+        id: test-action
+        uses: samyuan1990/i18n-agent-action@latest
+        with:
+          apikey: ${{ secert.api_key }}
+          RESERVED_WORD: i18n-agent-action
+          DOCS_FOLDER: /workspace/docs
+          CONFIG_FILE: /workspace/mkdocs.yml
+          workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "auto i18n with GHA"
+          body: "This PR do i18n for you"
+          branch: feature/i18n-${{ github.run_id }}
+          base: main  # 目标分支
+          draft: false
