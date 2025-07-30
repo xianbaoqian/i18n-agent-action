@@ -50,6 +50,9 @@ class clientInfo:
         """获取干跑模式状态"""
         return self._dryRun
 
+    def get_legal_info(self):
+        return "This content is powered by i18n-agent-action with LLM service " + self._base_url + " with model " + self._model
+
     # 可选：添加一个显示所有配置的方法
     def show_config(self):
         """显示当前配置"""

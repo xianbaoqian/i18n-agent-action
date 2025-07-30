@@ -53,7 +53,8 @@ def translate_element(
         },
     ]
     response = clientInfo.talk_to_LLM(messages)
-    output_content = response.choices[0].message.content
+    output_content = response.choices[0].message.content + "\n " + clientInfo.get_legal_info()
+    
     log("translated " + target_file)
     with open(target_file, "w", encoding="utf-8") as file:
         file.write(output_content)
