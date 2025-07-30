@@ -34,7 +34,6 @@ jobs:
         if: steps.changed-files.outputs.all_changed_files != ''
         id: addprefix
         run: |
-            # 读取原始输出并添加前缀
             PREFIX="/workspace/"
             PREPENDED_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | sed "s|^|$PREFIX|g" | sed "s|,|,$PREFIX|g")
             echo "PREPENDED_FILES=${PREPENDED_FILES}" >> $GITHUB_OUTPUT
