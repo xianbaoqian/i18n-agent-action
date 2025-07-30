@@ -47,7 +47,7 @@
 ## Usage
 to be specific, but considering with 12 factors agent, it supports local run in terminal, container or CI.
 
-### Manual(for dev, and you should take your own security as it not running in sandbox)
+### Manual(for dev, or you should take your own security as it not running in sandbox)
 ```bash
 pip3 install...
 export api_key={your_key}
