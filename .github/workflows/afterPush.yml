@@ -45,7 +45,7 @@ jobs:
           DOCS_FOLDER: /workspace/docs
           CONFIG_FILE: /workspace/mkdocs.yml
           workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
-          FILE_LIST: ${{ steps.changed-files.outputs.all_changed_files }}
+          FILE_LIST: /workspace/${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
