@@ -5,12 +5,7 @@
 
 
 ## UX todo
-- [ ] self i18n works as living demo and test base with dryRun
 - [ ] report as how many docs, tokens been used
-
-## Tech todo
-- [ ] phase 1 into run model
-- [ ] refactor LLM talk and client creation
 
 ## In scope and not in scope, and how it works.
 
@@ -74,21 +69,63 @@ docker run -it \
   ghcr.io/samyuan1990/i18n-agent-action:latest
 ```
 ### GHA
+```
+name: Manual i8n and PR Creation
 
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  i8n-and-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || 'main' }}  # 使用当前分支或main分支
+          fetch-depth: 0  # 获取所有历史记录以便创建分支
+
+      - name: Use this Action
+        id: use-action
+        uses: SamYuan1990/i18n-agent-action@main
+        with:
+          apikey: ${{ secrets.API_KEY }}
+          RESERVED_WORD: i18n-agent-action
+          DOCS_FOLDER: /workspace/docs
+          CONFIG_FILE: /workspace/mkdocs.yml
+          workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "auto i18n with GHA"
+          body: "This PR do i18n for you"
+          branch: feature/i18n-${{ github.run_id }}
+          base: main  # 目标分支
+          draft: false
+```
 
 ## Inputs
-- Config file
-- LLM service endpoint and API key
-- Run model(to be specific)
-- Specific file path(in case of LLM missing a path)
-- Reserved word
-- Optional Specific file if you have a file list
+| Item |	Description |
+| --- | --- | 
+| CONFIG_FILE	| Configuration file to your i18n setting |
+| base_url  | LLM service endpoint   |
+| apikey	| LLM service API key |
+| model |	LLM model (to be specific) |
+| DOCS_FOLDER	| In case of LLM missing a path |
+| RESERVED_WORD	| Reserved word |
+| FILE_LIST |	Optional specific file (if you have a file list for i18n task) |
 
 ## Outputs
 - Files.
 - Trace Logs, in console
 
 ## Adption communtiy/project
+- itself(https://github.com/SamYuan1990/i18n-agent-action/pull/15)
 - kepler
 
 ## Test Locally same as usage.manual
