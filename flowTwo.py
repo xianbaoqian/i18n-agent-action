@@ -1,4 +1,4 @@
-from utils import log,translate_element
+from utils import log
 from clientInfo import clientInfo
 
 #
