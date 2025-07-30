@@ -14,7 +14,7 @@ As for me, I can't parallel in [https://github.com/sustainable-computing-io/kepl
 
 # As it's an AI Agent
 ## How it works
-### Manual
+### Manual(for dev, or you should take your own security as it not running in sandbox)
 ```
 pip3 install -r ./requirements.txt
 export api_key={your_key}
@@ -23,7 +23,7 @@ python3 main.py {full_path_to_your_repo}/mkdocs.yml {full_path_to_your_repo}/doc
 ```
 and you shoud run linting by yourself.
 
-### Container
+### Container(running in sandbox)
 ```
 docker run -it \
   -v path_to_your_repo:/workspace \
@@ -36,6 +36,61 @@ docker run -it \
   -e FILE_LIST="/workspace/docs/index.md" \
   ghcr.io/samyuan1990/i18n-agent-action:latest
 ```
+### GHA
+I suggest you enable PR creation in project settng to make auto PR back.
+```
+name: Manual i8n and PR Creation
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  i8n-and-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || 'main' }}  # 使用当前分支或main分支
+          fetch-depth: 0  # 获取所有历史记录以便创建分支
+
+      - name: Use this Action
+        id: use-action
+        uses: SamYuan1990/i18n-agent-action@main
+        with:
+          apikey: ${{ secrets.API_KEY }}
+          RESERVED_WORD: i18n-agent-action
+          DOCS_FOLDER: /workspace/docs
+          CONFIG_FILE: /workspace/mkdocs.yml
+          workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "auto i18n with GHA"
+          body: "This PR do i18n for you"
+          branch: feature/i18n-${{ github.run_id }}
+          base: main  # 目标分支
+          draft: false
+```
+## Inputs
+| Item |	Description |
+| --- | --- | 
+| CONFIG_FILE	| Configuration file to your i18n setting |
+| base_url  | LLM service endpoint   |
+| apikey	| LLM service API key |
+| model |	LLM model (to be specific) |
+| DOCS_FOLDER	| In case of LLM missing a path |
+| RESERVED_WORD	| Reserved word |
+| FILE_LIST |	Optional specific file (if you have a file list for i18n task) |
+
+## Adption communtiy/project
+- itself(https://github.com/SamYuan1990/i18n-agent-action/pull/15)
+- kepler
 
 ## In scope and not in scope, and how it works.
 
