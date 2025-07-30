@@ -30,11 +30,20 @@ jobs:
           files_ignore: |
             docs/**/*.*.md  # 匹配所有语言变体
 
-      - name: Print and use changed files
+      - name: Add prefix to each file
         if: steps.changed-files.outputs.all_changed_files != ''
+        id: addprefix
+        run: |
+            # 读取原始输出并添加前缀
+            PREFIX="/workspace/"
+            PREPENDED_FILES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | sed "s|^|$PREFIX|g" | sed "s|,|,$PREFIX|g")
+            echo "PREPENDED_FILES=${PREPENDED_FILES}" >> $GITHUB_OUTPUT
+
+      - name: Print and use changed files
+        if: steps.addprefix.outputs.PREPENDED_FILES != ''
         run: |
           echo "Changed markdown files (excluding all i18n variants):"
-          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "${{ steps.addprefix.outputs.PREPENDED_FILES }}"
 
       - name: Use this Action
         id: use-action
@@ -45,7 +54,7 @@ jobs:
           DOCS_FOLDER: /workspace/docs
           CONFIG_FILE: /workspace/mkdocs.yml
           workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
-          FILE_LIST: /workspace/${{ steps.changed-files.outputs.all_changed_files }}
+          FILE_LIST: ${{ steps.addprefix.outputs.PREPENDED_FILES }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
