@@ -42,7 +42,7 @@ def missingfiles(configfile_path,doc_folder,config, clientInfo):
     log("问题2 回答:" + response2.choices[0].message.content)
     json_todo_list=extract_json_from_text(response2.choices[0].message.content)
     log(len(json_todo_list["todo"]))
-    log(json_todo_list["todo"][0])
+    # log(json_todo_list["todo"][0])
     return json_todo_list
 
 ### Phase 1 givenfiles
