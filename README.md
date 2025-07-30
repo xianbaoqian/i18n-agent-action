@@ -2,7 +2,8 @@
 
 [![GitHub Super-Linter](https://github.com/actions/hello-world-docker-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/hello-world-docker-action/actions/workflows/ci.yml/badge.svg)
-
+[![Deploy Docs](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/deploy.yml/badge.svg)](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/deploy.yml)
+[![image](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/image.yml/badge.svg)](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/image.yml)
 
 ## UX todo
 - [ ] report as how many docs, tokens been used
@@ -46,7 +47,7 @@
 ## Usage
 to be specific, but considering with 12 factors agent, it supports local run in terminal, container or CI.
 
-### Manual
+### Manual(for dev, and you should take your own security as it not running in sandbox)
 ```bash
 pip3 install...
 export api_key={your_key}
@@ -55,7 +56,7 @@ export api_key={your_key}
 python3 main.py ./mkdocs.yml ./docs i18n-agent-action ./docs/index.md
 ```
 
-### Container
+### Container(running in sandbox)
 ```
 docker run -it \
   -v path_to_your_repo:/workspace \
@@ -69,6 +70,7 @@ docker run -it \
   ghcr.io/samyuan1990/i18n-agent-action:latest
 ```
 ### GHA
+I suggest you enable PR creation in project settng to make auto PR back.
 ```
 name: Manual i8n and PR Creation
 
