@@ -1,0 +1,33 @@
+name: Process Changed Markdown Files
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**/*.md'
+
+jobs:
+  process-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed markdown files (excluding all i18n variants)
+        id: changed-files
+        uses: tj-actions/changed-files@v40
+        with:
+          since_last_remote_commit: true
+          separator: ","
+          files: |
+            docs/**/*.md
+          files_ignore: |
+            docs/**/*.*.md  # 匹配所有语言变体
+
+      - name: Print and use changed files
+        if: steps.changed-files.outputs.all_changed_files != ''
+        run: |
+          echo "Changed markdown files (excluding all i18n variants):"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}"
