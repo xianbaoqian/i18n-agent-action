@@ -1,5 +1,9 @@
 name: Process Changed Markdown Files
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   push:
     branches:
@@ -31,3 +35,23 @@ jobs:
         run: |
           echo "Changed markdown files (excluding all i18n variants):"
           echo "${{ steps.changed-files.outputs.all_changed_files }}"
+
+      - name: Use this Action
+        id: use-action
+        uses: SamYuan1990/i18n-agent-action@main
+        with:
+          apikey: ${{ secrets.API_KEY }}
+          RESERVED_WORD: i18n-agent-action
+          DOCS_FOLDER: /workspace/docs
+          CONFIG_FILE: /workspace/mkdocs.yml
+          workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
+          FILE_LIST: ${{ steps.changed-files.outputs.all_changed_files }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "auto i18n with GHA"
+          body: "This PR do i18n for you"
+          branch: feature/i18n-${{ github.run_id }}
+          base: main  # 目标分支
+          draft: false
