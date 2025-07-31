@@ -5,6 +5,7 @@ import yaml
 from clientInfo import clientInfo
 from flowOne import givenfiles, missingfiles
 from flowTwo import flowtwo
+from metric import print_metrics
 from utils import log, validate_inputs
 
 with open("config.yaml", "r", encoding="utf-8") as f:
@@ -46,3 +47,5 @@ if len(args) > 4:
     json_todo_list = givenfiles(configfile_path, file_list, config, Info)
     ### Phase 2
     flowtwo(json_todo_list, reserved_word, doc_folder, Info)
+
+print_metrics()
