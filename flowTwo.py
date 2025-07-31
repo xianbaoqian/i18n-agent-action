@@ -56,6 +56,7 @@ def translate_element(
     output_content = response.choices[0].message.content + "\n " + clientInfo.get_legal_info()
     
     log("translated " + target_file)
+    os.makedirs(os.path.dirname(target_file), exist_ok=True)
     with open(target_file, "w", encoding="utf-8") as file:
         file.write(output_content)
 
