@@ -1,4 +1,5 @@
 import os
+import threading
 
 from metric import (
     FILES_TRANSLATED,
@@ -105,13 +106,36 @@ def flowtwo(
     json_todo_list, reserved_word, doc_folder, clientInfo, force_refresh: bool = True
 ):
     total = len(json_todo_list["todo"])
-    i = 0
     if clientInfo.get_dryRun():
         log("dry Run model skip")
         return
+    
+    # Create a list to hold our threads
+    threads = []
+    # Create a counter for completed tasks (similar to WaitGroup)
+    completed = 0
+    # Lock for thread-safe counter updates
+    counter_lock = threading.Lock()
+    
+    def worker(item):
+        nonlocal completed
+        try:
+            log("processing...one file")
+            translate_element(reserved_word, doc_folder, item, clientInfo, force_refresh)
+        finally:
+            with counter_lock:
+                completed += 1
+                remaining = total - completed
+                log(f"todo: {remaining}")
+    
+    # Create and start threads
     for item in json_todo_list["todo"]:
-        log("processing...one file")
-        translate_element(reserved_word, doc_folder, item, clientInfo, force_refresh)
-        i = i + 1
-        log("todo")
-        log(total - i)
+        thread = threading.Thread(target=worker, args=(item,))
+        thread.start()
+        threads.append(thread)
+    
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
+    
+    log("All tasks completed")
