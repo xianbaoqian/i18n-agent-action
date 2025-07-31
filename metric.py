@@ -1,4 +1,4 @@
-from prometheus_client import Counter, Gauge
+from prometheus_client import Counter, Gauge, REGISTRY
 from prometheus_client.exposition import generate_latest
 
 # 定义指标
