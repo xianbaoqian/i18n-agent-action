@@ -23,7 +23,6 @@ def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
 def translate_element(
     reserved_word, doc_folder, element, clientInfo, force_refresh: bool = True
 ):
-
     TRANSLATION_REQUESTS.labels(
         reserved_word=reserved_word,
         target_language=element["target_language"],
@@ -54,7 +53,6 @@ def translate_element(
 
     if not should_refresh(target_file, force_refresh):
         log("skip file as target already there," + target_file)
-        # 记录目标文件已存在指标
         TARGET_FILE_EXISTS.labels(
             reserved_word=reserved_word, target_language=element["target_language"]
         ).inc()
@@ -64,42 +62,64 @@ def translate_element(
             status="target_exists",
         ).inc()
         return
+    
     target_language = element["target_language"]
-
+    
+    # Read the entire source file
     with open(source_file, "r", encoding="utf-8") as file:
-        file_content = file.read()  # 读取全部内容为字符串
-    # in this turn, we just use one short to translate the files
-    messages = [
-        {"role": "system", "content": "You are a senior translators"},
-        {
-            "role": "user",
-            "content": """
-            please help translate content below into """
-            + target_language
-            + """ for me, please keep """
-            + reserved_word
-            + """ in english and keep the markdown style, here is the content: \n
-            """
-            + file_content,
-        },
-    ]
-    response = clientInfo.talk_to_LLM(messages)
-    output_content = (
-        response.choices[0].message.content + "\n " + clientInfo.get_legal_info()
-    )
-
+        file_content = file.read()
+    
+    # Split content into chunks of 3000 characters
+    chunk_size = 3000
+    chunks = [file_content[i:i+chunk_size] for i in range(0, len(file_content), chunk_size)]
+    
+    translated_chunks = []
+    for i, chunk in enumerate(chunks):
+        log(f"Processing chunk {i+1}/{len(chunks)} of {source_file}")
+        
+        messages = [
+            {"role": "system", "content": "You are a senior translator"},
+            {
+                "role": "user",
+                "content": """
+                Please help translate the following content into """
+                + target_language
+                + """, keeping """
+                + reserved_word
+                + """ in English and maintaining the markdown style. 
+                This is part """
+                + f"{i+1} of {len(chunks)} of the document.\n\n"
+                + chunk,
+            },
+        ]
+        
+        try:
+            response = clientInfo.talk_to_LLM(messages)
+            translated_chunks.append(response.choices[0].message.content)
+        except Exception as e:
+            log(f"Error translating chunk {i+1}: {str(e)}")
+            TRANSLATION_REQUESTS.labels(
+                reserved_word=reserved_word,
+                target_language=target_language,
+                status="error",
+            ).inc()
+            raise
+    
+    # Combine all translated chunks
+    output_content = "\n".join(translated_chunks) + "\n " + clientInfo.get_legal_info()
+    
     log("translated " + target_file)
     os.makedirs(os.path.dirname(target_file), exist_ok=True)
     with open(target_file, "w", encoding="utf-8") as file:
         file.write(output_content)
-    # 记录成功翻译指标
+    
+    # Record successful translation metrics
     FILES_TRANSLATED.labels(
         reserved_word=reserved_word, target_language=target_language
     ).inc()
     TRANSLATION_REQUESTS.labels(
         reserved_word=reserved_word, target_language=target_language, status="success"
     ).inc()
-
 
 ### Phase 2
 def flowtwo(

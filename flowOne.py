@@ -2,7 +2,7 @@ from utils import extract_json_from_text, get_tree_output, log
 
 
 ### Phase 1 missingfiles
-def missingfiles(configfile_path, doc_folder, config, clientInfo):
+def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationConfig):
     with open(configfile_path, "r", encoding="utf-8") as file:
         config_file_content = file.read()  # 读取全部内容为字符串
 
@@ -40,7 +40,7 @@ def missingfiles(configfile_path, doc_folder, config, clientInfo):
     """
             + tree_list
             + """\n
-    could you please list the missing file in support language?  \n
+    could you please list top """ + str(TranslationConfig.get_max_files()) +""" missing file in """+ TranslationConfig.get_target_language() +""" language?  \n
     """
             + config["prompts"]["json_schema"],
         }
@@ -84,7 +84,7 @@ def givenfiles(configfile_path, file_list, config, clientInfo):
         {
             "role": "user",
             "content": """
-    file list below been changed, could you please list the need translation files in support language?  \n
+    file list below been changed, could you please list the need translation files in """+ TranslationConfig.get_target_language() +""" language?  \n
     """
             + config["prompts"]["json_schema"]
             + """\n
