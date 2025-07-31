@@ -1,5 +1,11 @@
 import os
 
+from metric import (
+    FILES_TRANSLATED,
+    SOURCE_FILE_MISSING,
+    TARGET_FILE_EXISTS,
+    TRANSLATION_REQUESTS,
+)
 from utils import log
 
 
@@ -16,6 +22,13 @@ def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
 def translate_element(
     reserved_word, doc_folder, element, clientInfo, force_refresh: bool = True
 ):
+
+    TRANSLATION_REQUESTS.labels(
+        reserved_word=reserved_word,
+        target_language=element["target_language"],
+        status="started",
+    ).inc()
+
     log(f"processing: {element}")
 
     source_file = element["source_file"]
@@ -24,6 +37,14 @@ def translate_element(
 
     if not os.path.exists(source_file):
         log("skip as source file missing file " + source_file)
+        SOURCE_FILE_MISSING.labels(
+            reserved_word=reserved_word, target_language=element["target_language"]
+        ).inc()
+        TRANSLATION_REQUESTS.labels(
+            reserved_word=reserved_word,
+            target_language=element["target_language"],
+            status="source_missing",
+        ).inc()
         return
 
     target_file = element["target_file"]
@@ -32,6 +53,15 @@ def translate_element(
 
     if not should_refresh(target_file, force_refresh):
         log("skip file as target already there," + target_file)
+        # 记录目标文件已存在指标
+        TARGET_FILE_EXISTS.labels(
+            reserved_word=reserved_word, target_language=element["target_language"]
+        ).inc()
+        TRANSLATION_REQUESTS.labels(
+            reserved_word=reserved_word,
+            target_language=element["target_language"],
+            status="target_exists",
+        ).inc()
         return
     target_language = element["target_language"]
 
@@ -61,6 +91,13 @@ def translate_element(
     os.makedirs(os.path.dirname(target_file), exist_ok=True)
     with open(target_file, "w", encoding="utf-8") as file:
         file.write(output_content)
+    # 记录成功翻译指标
+    FILES_TRANSLATED.labels(
+        reserved_word=reserved_word, target_language=target_language
+    ).inc()
+    TRANSLATION_REQUESTS.labels(
+        reserved_word=reserved_word, target_language=target_language, status="success"
+    ).inc()
 
 
 ### Phase 2
