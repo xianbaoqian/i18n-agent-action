@@ -2,16 +2,6 @@
 It was discussed on KCD 2025 BeiJing, Community Over Code 2025 China and we finally dicede to make an agent to handle i18n works for community.
 As for me, I can't parallel in [https://github.com/sustainable-computing-io/kepler-doc/issues/175](https://github.com/sustainable-computing-io/kepler-doc/issues/175) and Community Over Code 2025's session.
 
-## Try with my own Principles of Agent Development
-
-#### Inference 1: If the task is relatively fixed and there is a reliable solution, there is no need to call on a large model to take risks.
-
-#### Inference 2: The tasks are not fixed, and adapting them one by one is too complex. The big model has a certain universality, and we need to make good use of this universality and entrust it to the big model.
-
-#### Inference 3: The task is not fixed and can be adapted one by one, depending on the actual situation. If using a large model, it is necessary to consider the situation where the large model answers incorrectly and handle the errors accordingly.
-
-#### Inference 4: The task is fixed and there is no reliable solution. If using a large model to attempt creative solutions, manual intervention is required.
-
 # As it's an AI Agent
 ## How it works
 ### Manual(for dev, or you should take your own security as it not running in sandbox)
@@ -141,15 +131,19 @@ jobs:
 ```  
 
 ## Inputs
-| Item |	Description |
-| --- | --- | 
-| CONFIG_FILE	| Configuration file to your i18n setting |
-| base_url  | LLM service endpoint   |
-| apikey	| LLM service API key |
-| model |	LLM model (to be specific) |
-| DOCS_FOLDER	| In case of LLM missing a path |
-| RESERVED_WORD	| Reserved word |
-| FILE_LIST |	Optional specific file (if you have a file list for i18n task) |
+| Input Parameter | Required | Default Value | Description |
+|-----------------|----------|---------------|-------------|
+| `apikey`        | Yes      | -             | API key for the LLM service |
+| `base_url`      | No       | DeepSeek             | Endpoint URL of the LLM service |
+| `model`         | No       | DeepSeek v3            | Model name/identifier for the LLM service |
+| `RESERVED_WORD` | Yes      | -             | Reserved terms/phrases to exclude from translation |
+| `DOCS_FOLDER`   | Yes      | -             | Path to your documentation folder |
+| `CONFIG_FILE`   | Yes      | -             | Configuration file for project i18n settings |
+| `FILE_LIST`     | No       | -             | Specific list of files to process (optional) |
+| `workspace`     | Yes      | -             | Path to your code repository workspace |
+| `target_language` | No     | `'zh'`        | Target language code for translation (e.g., `'zh'` for Chinese) |
+| `max_files`     | No       | `'20'`        | Maximum number of files to process |
+| `dryRun`        | No       | false             | Enable dry-run mode (simulates execution without making changes) |
 
 ## Adption communtiy/project
 - itself(https://github.com/SamYuan1990/i18n-agent-action/pull/15)

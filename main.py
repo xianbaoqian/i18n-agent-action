@@ -21,7 +21,7 @@ Info = clientInfo(
 Info.show_config()
 
 TranslationConfig = TranslationConfig(
-    target_language=os.getenv("target_language", "zh"),
+    target_language=os.getenv("target_language", "support"),
     max_files=os.getenv("max_files",20)
 )
 TranslationConfig.show_config()
