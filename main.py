@@ -6,6 +6,7 @@ from clientInfo import clientInfo
 from flowOne import givenfiles, missingfiles
 from flowTwo import flowtwo
 from metric import print_metrics
+from transcontrol import TranslationConfig
 from utils import log, validate_inputs
 
 with open("config.yaml", "r", encoding="utf-8") as f:
@@ -18,6 +19,12 @@ Info = clientInfo(
     dryRun=os.getenv("dryRun", False),
 )
 Info.show_config()
+
+TranslationConfig = TranslationConfig(
+    target_language=os.getenv("target_language", "support"),
+    max_files=os.getenv("max_files", 20),
+)
+TranslationConfig.show_config()
 
 args = sys.argv
 try:
@@ -36,16 +43,20 @@ except ValueError as e:
 
 ## Workflow 1 missing files
 ### Phase 1
-json_todo_list = missingfiles(configfile_path, doc_folder, config, Info)
+json_todo_list = missingfiles(
+    configfile_path, doc_folder, config, Info, TranslationConfig
+)
 ### Phase 2
-flowtwo(json_todo_list, reserved_word, doc_folder, Info, False)
+flowtwo(json_todo_list, reserved_word, doc_folder, config, Info, False)
 ## Workflow 2
 ### Phase 1
 if len(args) > 4:
     file_list = args[4]
     log(file_list)
-    json_todo_list = givenfiles(configfile_path, file_list, config, Info)
+    json_todo_list = givenfiles(
+        configfile_path, file_list, config, Info, TranslationConfig
+    )
     ### Phase 2
-    flowtwo(json_todo_list, reserved_word, doc_folder, Info)
+    flowtwo(json_todo_list, reserved_word, doc_folder, config, Info)
 
 print_metrics()
