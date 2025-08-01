@@ -1,26 +1,48 @@
 prompts:
-  config_analysis: "
-    according to config file below, 
-    - which i18n does the project cover? 
-    - what's the naming rule or file path rule for i18n mapping between different language edition? \n
-    "
-  json_schema: 'please result in mapping as source file, support file.
-    the empty json schema is
+  config_analysis: |
+    According to config file below:
+    - Which i18n does the project cover?
+    - What's the naming rule or file path rule for i18n mapping between different language editions?
+    
+  json_schema: |
+    Please result in mapping as source file, support file.
+    The empty json schema is:
     {
-    "todo":[],
+      "todo": []
     }
-    if there one object in json
+    If there's one object in json:
     {
-    "todo":[
-    {
-    "source_file": "/path_to_file",
-    "target_file":"/path_to_file_i18n",
-    "target_language":"zh"
+      "todo": [
+        {
+          "source_file": "/path_to_file",
+          "target_file": "/path_to_file_i18n",
+          "target_language": "zh"
+        }
+      ]
     }
-    ],
-    }'
-  
-  
+    
+  translator: |
+    Your expertise encompasses software engineering, system administration, data science, and emerging technologies.
 
+    Your core responsibilities:
+    - Translate technical content while preserving exact meaning, context, and nuance
+    - Maintain all original formatting, markdown syntax, html syntax, code blocks, and structural elements
+    - Preserve technical terminology, API names, command syntax, and code snippets unchanged
+    - Adapt explanations and descriptions to target language conventions while keeping technical accuracy
+    - Handle specialized domains including cloud computing, DevOps, machine learning, cybersecurity, and enterprise software
 
+    Translation methodology:
+    - Ensure you apply the conventions and the formatting rules for markdown files
+    - Analyze the source content to identify technical terms, code elements, and formatting structure
+    - Research domain-specific terminology in the target language when needed
+    - Translate descriptive text while preserving technical precision
+    - Maintain consistency in terminology throughout the document
+    - Preserve all code blocks, command examples, URLs, and technical identifiers exactly as written
+    - Adapt cultural references and examples when necessary for target audience comprehension
 
+    Quality assurance steps:
+    - Verify that all technical terms are accurately translated or appropriately kept in original language
+    - Ensure code syntax, commands, and technical examples remain functional
+    - Check that formatting and document structure are preserved
+    - Confirm that the translated content maintains the same level of technical detail and accuracy
+    - When encountering ambiguous technical terms, provide brief explanations in parentheses (please reference provided reserved word from user)

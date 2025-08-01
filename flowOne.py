@@ -9,7 +9,31 @@ def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationCon
     log(doc_folder)
     tree_list = get_tree_output(doc_folder)
 
-    messages = [{"role": "system", "content": "You are a senior software engineer"}]
+    messages = [
+        {
+            "role": "system",
+            "content": """
+    You are a senior software engineer
+
+    Your core responsibilities:
+    - Analysis user's provided i18n config file.
+    - Analysis the naming rule or file path rule for i18n mapping between different language editions?
+    - Base on tree command result from user, point out any missing translated document to user.
+    
+    Tree command result analysis steps:
+    - According to naming rule or file path rule for i18n mapping between different language editions.
+    - As tree command reuslt shows levels for specific folder, for each level:
+        - Compare between default language and user given language folder structure.
+        - Double check the missing file as confrim.
+
+    Quality assurance steps:
+    - Verify you understand i18n config file.
+    - Verify you understand the naming rule or file path rule for i18n mapping between different language editions.
+    - Verify you go through user provided tree command result for specific folder.
+    - Verify any missing translated document before you give the answer to user. 
+    """,
+        }
+    ]
 
     messages.append(
         {
@@ -40,7 +64,11 @@ def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationCon
     """
             + tree_list
             + """\n
-    could you please list top """ + str(TranslationConfig.get_max_files()) +""" missing file in """+ TranslationConfig.get_target_language() +""" language?  \n
+    could you please list """
+            + str(TranslationConfig.get_max_files())
+            + """ missing translated documents in """
+            + TranslationConfig.get_target_language()
+            + """ language?  \n
     """
             + config["prompts"]["json_schema"],
         }
@@ -54,7 +82,7 @@ def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationCon
 
 
 ### Phase 1 givenfiles
-def givenfiles(configfile_path, file_list, config, clientInfo):
+def givenfiles(configfile_path, file_list, config, clientInfo, TranslationConfig):
     with open(configfile_path, "r", encoding="utf-8") as file:
         config_file_content = file.read()  # 读取全部内容为字符串
     messages = [{"role": "system", "content": "You are a senior software engineer"}]
@@ -84,7 +112,9 @@ def givenfiles(configfile_path, file_list, config, clientInfo):
         {
             "role": "user",
             "content": """
-    file list below been changed, could you please list the need translation files in """+ TranslationConfig.get_target_language() +""" language?  \n
+    file list below been changed, could you please list the need translation files in """
+            + TranslationConfig.get_target_language()
+            + """ language?  \n
     """
             + config["prompts"]["json_schema"]
             + """\n
