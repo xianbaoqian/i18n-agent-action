@@ -27,7 +27,7 @@ inputs:
     required: true  
   target_language:
     description: target language
-    default: 'zh'
+    default: 'support'
   max_files:
     description: max file numbers
     default: '20'
