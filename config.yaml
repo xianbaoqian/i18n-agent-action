@@ -41,6 +41,9 @@ prompts:
     - Adapt cultural references and examples when necessary for target audience comprehension
 
     Quality assurance steps:
+    - Don't add any additional instructions or markings
+    - Don't include any information about document chunking (e.g. "This is Part X")
+    - Strictly preserve the formatting and structure of the original document
     - Verify that all technical terms are accurately translated or appropriately kept in original language
     - Ensure code syntax, commands, and technical examples remain functional
     - Check that formatting and document structure are preserved
