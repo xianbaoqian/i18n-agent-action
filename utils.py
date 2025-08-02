@@ -66,34 +66,3 @@ def get_tree_output(directory="."):
     except FileNotFoundError:
         print("未找到tree命令，请确保已安装tree工具")
         return None
-
-
-def extract_json_from_text(text):
-    """
-    从文本中提取 JSON 对象
-
-    参数:
-        text (str): 包含 JSON 的文本内容
-
-    返回:
-        dict: 提取的 JSON 对象
-        None: 如果未找到有效的 JSON
-    """
-    # 使用正则表达式匹配 JSON 部分（从第一个 { 到最后一个 }）
-    # re.search(r'```json\n(.*?)\n```', text, re.DOTALL)
-    json_pattern = r"```json\n(.*?)\n```"
-    match = re.search(json_pattern, text, re.DOTALL)
-
-    if not match:
-        return None
-
-    json_str = match.group(1)
-
-    try:
-        # 尝试解析 JSON
-        log(json_str)
-        json_data = json.loads(json_str)
-        return json_data
-    except json.JSONDecodeError as e:
-        log(f"JSON 解析错误: {e}")
-        return None
