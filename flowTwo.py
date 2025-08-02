@@ -1,3 +1,4 @@
+import json
 import os
 import threading
 
@@ -84,21 +85,26 @@ def translate_element(
             {"role": "system", "content": config["prompts"]["translator"]},
             {
                 "role": "user",
-                "content": """
-                Please help translate the following content into """
-                + target_language
-                + """, reserved word: """
-                + reserved_word
-                + """ in English  
-                This is part """
-                + f"{i+1} of {len(chunks)} of the document.\n\n"
-                + chunk,
+                "content": f"""
+    Please help translate the following content into {target_language}, reserved word: {reserved_word} in English.
+    This is part {i+1} of {len(chunks)} of the document.
+
+    Example json output format:
+    {{
+        "content": "translated text here...",
+        "metadata": {{"chunk": {i+1}, "total": {len(chunks)}}}
+    }}
+
+    Content to translate:
+    {chunk}
+    """,
             },
         ]
-
         try:
-            response = clientInfo.talk_to_LLM(messages)
-            translated_chunks.append(response.choices[0].message.content)
+            response = clientInfo.talk_to_LLM_Json(messages)
+            translated_chunks.append(
+                json.loads(response.choices[0].message.content)["content"]
+            )
         except Exception as e:
             log(f"Error translating chunk {i+1}: {str(e)}")
             TRANSLATION_REQUESTS.labels(
