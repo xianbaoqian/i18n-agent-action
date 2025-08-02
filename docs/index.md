@@ -141,15 +141,19 @@ jobs:
 ```  
 
 ## Inputs
-| Item |	Description |
-| --- | --- | 
-| CONFIG_FILE	| Configuration file to your i18n setting |
-| base_url  | LLM service endpoint   |
-| apikey	| LLM service API key |
-| model |	LLM model (to be specific) |
-| DOCS_FOLDER	| In case of LLM missing a path |
-| RESERVED_WORD	| Reserved word |
-| FILE_LIST |	Optional specific file (if you have a file list for i18n task) |
+| Input Parameter | Required | Default Value | Description |
+|-----------------|----------|---------------|-------------|
+| `apikey`        | Yes      | -             | API key for the LLM service |
+| `base_url`      | No       | DeepSeek             | Endpoint URL of the LLM service |
+| `model`         | No       | DeepSeek v3            | Model name/identifier for the LLM service |
+| `RESERVED_WORD` | Yes      | -             | Reserved terms/phrases to exclude from translation |
+| `DOCS_FOLDER`   | Yes      | -             | Path to your documentation folder |
+| `CONFIG_FILE`   | Yes      | -             | Configuration file for project i18n settings |
+| `FILE_LIST`     | No       | -             | Specific list of files to process (optional) |
+| `workspace`     | Yes      | -             | Path to your code repository workspace |
+| `target_language` | No     | `'zh'`        | Target language code for translation (e.g., `'zh'` for Chinese) |
+| `max_files`     | No       | `'20'`        | Maximum number of files to process |
+| `dryRun`        | No       | false             | Enable dry-run mode (simulates execution without making changes) |
 
 ## Tested communtiy/project
 - itself(https://github.com/SamYuan1990/i18n-agent-action/pull/15)
