@@ -79,12 +79,10 @@ class clientInfo:
     def talk_to_LLM_Json(self, messages):
         if not self._dryRun:
             response = self._client.chat.completions.create(
-                model=self._model, 
-                messages=messages, 
+                model=self._model,
+                messages=messages,
                 stream=False,
-                response_format={
-                    'type': 'json_object'
-                }
+                response_format={"type": "json_object"},
             )
             return response
         else:

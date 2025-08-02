@@ -1,5 +1,7 @@
 import json
+
 from utils import get_tree_output, log
+
 
 ### Phase 1 missingfiles
 def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationConfig):
@@ -75,7 +77,7 @@ def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationCon
     )
     response2 = clientInfo.talk_to_LLM_Json(messages)
     log("问题2 回答:" + response2.choices[0].message.content)
-    json_todo_list = (json.loads(response2.choices[0].message.content))
+    json_todo_list = json.loads(response2.choices[0].message.content)
     log(len(json_todo_list["todo"]))
     # log(json_todo_list["todo"][0])
     return json_todo_list
@@ -125,6 +127,6 @@ def givenfiles(configfile_path, file_list, config, clientInfo, TranslationConfig
     )
     response2 = clientInfo.talk_to_LLM_Json(messages)
     log("问题2 回答:" + response2.choices[0].message.content)
-    json_todo_list = (json.loads(response2.choices[0].message.content))
+    json_todo_list = json.loads(response2.choices[0].message.content)
     log(len(json_todo_list["todo"]))
     return json_todo_list
