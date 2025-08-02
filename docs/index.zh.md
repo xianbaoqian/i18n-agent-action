@@ -117,7 +117,8 @@ jobs:
       - name: 打印并使用变更的文件
         if: steps.changed-files.outputs.all_changed_files != ''
         run: |
-          echo "变更的markdown文件（不包括所有i18n变体）:"
+          echo
+变更的markdown文件（不包括所有i18n变体）:
           echo "${{ steps.changed-files.outputs.all_changed_files }}"
 
       - name: 使用此Action
@@ -139,7 +140,6 @@ jobs:
           branch: feature/i18n-${{ github.run_id }}
           base: main  # 目标分支
           draft: false
-```
 
 ## 输入
 | 输入参数 | 是否必需 | 默认值 | 描述 |
@@ -163,4 +163,5 @@ muntiy/项目
 
 ## 不在范围内
 - lint
+ 免责声明：此内容由i18n-agent-action与LLM服务https://api.deepseek.com使用模型deepseek-chat提供，出于某些原因（例如，我们不是母语者），我们使用LLM为您提供此翻译。如果您发现任何需要更正的地方，请提交问题或向github提出PR，并切换回默认语言。
  Disclaimers: This content is powered by i18n-agent-action with LLM service https://api.deepseek.com with model deepseek-chat, for some reason, (for example, we are not native speaker) we use LLM to provide this translate for you. If you find any corrections, please file an issue or raise a PR back to github, and switch back to default language.
