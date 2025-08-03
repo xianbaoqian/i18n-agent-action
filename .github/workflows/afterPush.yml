@@ -2,6 +2,9 @@ name: Process Changed Markdown Files
 
 on:
   workflow_call:
+    secrets:
+      API_KEY:
+        required: true
 
 jobs:
   process-markdown:
