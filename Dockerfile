@@ -13,9 +13,6 @@ WORKDIR /app
 COPY --from=builder /root/.local /root/.local
 COPY . .
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends tree && \
-    rm -rf /var/lib/apt/lists/*
 # 确保脚本可访问
 ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONPATH=/app
