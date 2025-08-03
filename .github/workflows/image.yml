@@ -3,7 +3,7 @@ name: image
 on: # yamllint disable-line rule:truthy
   workflow_call:
     secrets:
-      GITHUB_TOKEN:
+      API_KEY:
         required: true
 
 jobs:

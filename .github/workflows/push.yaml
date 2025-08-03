@@ -15,7 +15,7 @@ jobs:
   image:
     uses: ./.github/workflows/image.yml
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      API_KEY: ${{ secrets.GITHUB_TOKEN }} 
   # for each PR merge, unit test for test coverage
   updatedoc:
     needs: image
