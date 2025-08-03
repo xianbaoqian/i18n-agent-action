@@ -1,18 +1,15 @@
 name: image
 
 on: # yamllint disable-line rule:truthy
-  push:
-    branches:
-      - main
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
 
 jobs:
   image_build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-      attestations: write
-      packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4

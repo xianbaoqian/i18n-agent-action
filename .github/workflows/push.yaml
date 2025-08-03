@@ -1,0 +1,25 @@
+name: Push
+on: # yamllint disable-line rule:truthy
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  # for each PR merge, trigger image build
+  image:
+    uses: ./.github/workflows/image.yml
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+  # for each PR merge, unit test for test coverage
+  updatedoc:
+    needs: image
+    uses: ./.github/workflows/afterPush.yml
+    secrets:
+      API_KEY: ${{ secrets.API_KEY }}
+
