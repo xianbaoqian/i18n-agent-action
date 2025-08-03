@@ -3,7 +3,7 @@
 [![GitHub Super-Linter](https://github.com/actions/hello-world-docker-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
 ![CI](https://github.com/actions/hello-world-docker-action/actions/workflows/ci.yml/badge.svg)
 [![Deploy Docs](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/deploy.yml/badge.svg)](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/deploy.yml)
-[![image](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/image.yml/badge.svg)](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/image.yml)
+[![Push](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/push.yaml/badge.svg)](https://github.com/SamYuan1990/i18n-agent-action/actions/workflows/push.yaml)
 
 ## Usage
 see [doc](./docs/index.md)
@@ -13,9 +13,10 @@ see [doc](./docs/index.md)
 - itself(<https://github.com/SamYuan1990/i18n-agent-action/pull/15>)
 - HAMi
 
-## UX todo
+## Why we have this
 
-- [ ] report as how many docs, tokens been used
+It was discussed on KCD 2025 BeiJing, Community Over Code 2025 China and we finally dicede to make an agent to handle i18n works for community.
+As for me, I can't parallel in [https://github.com/sustainable-computing-io/kepler-doc/issues/175](https://github.com/sustainable-computing-io/kepler-doc/issues/175) and Community Over Code 2025's session.
 
 ## Try with my own Principles of Agent Development
 
