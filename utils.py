@@ -1,6 +1,6 @@
 import os
-import subprocess
 from pathlib import Path
+
 
 def validate_inputs(args):
     """
@@ -50,6 +50,7 @@ def validate_inputs(args):
 def log(msg):
     print(msg)
 
+
 def get_all_files(directory):
     path = Path(directory)
-    return [file.resolve() for file in path.rglob('*/*') if file.is_file()]
+    return [file.resolve() for file in path.rglob("*/*") if file.is_file()]

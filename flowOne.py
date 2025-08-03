@@ -2,13 +2,14 @@ import json
 
 from utils import get_all_files, log
 
+
 ### Phase 1 missingfiles
 def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationConfig):
     with open(configfile_path, "r", encoding="utf-8") as file:
         config_file_content = file.read()  # 读取全部内容为字符串
 
     log(doc_folder)
-    #tree_list = get_tree_output(doc_folder)
+    # tree_list = get_tree_output(doc_folder)
 
     messages = [
         {
@@ -59,22 +60,25 @@ def missingfiles(configfile_path, doc_folder, config, clientInfo, TranslationCon
     batch_size = 30
     all_todos = []  # 用于累积所有批次的待办事项
     for i in range(0, len(filelist), batch_size):
-        batch = filelist[i:i + batch_size]
+        batch = filelist[i : i + batch_size]
         messages.append(
-                {
-                    "role": "user",
-                    "content": (
-                        f"here is part {i//batch_size + 1} of file lists for docs folder\n"
-                        + "\n".join(str(filepath) for filepath in batch)
-                        + "\n\ncould you please list missing translated documents in "
-                        + TranslationConfig.get_target_language()
-                        + " language?\n\n"
-                        + config["prompts"]["json_schema"]
-                    )
-                }
-            )
+            {
+                "role": "user",
+                "content": (
+                    f"here is part {i//batch_size + 1} of file lists for docs folder\n"
+                    + "\n".join(str(filepath) for filepath in batch)
+                    + "\n\ncould you please list missing translated documents in "
+                    + TranslationConfig.get_target_language()
+                    + " language?\n\n"
+                    + config["prompts"]["json_schema"]
+                ),
+            }
+        )
         response2 = clientInfo.talk_to_LLM_Json(messages)
-        log(f"问题2 回答(批次 {i//batch_size + 1}):" + response2.choices[0].message.content)
+        log(
+            f"问题2 回答(批次 {i//batch_size + 1}):"
+            + response2.choices[0].message.content
+        )
 
         current_batch = json.loads(response2.choices[0].message.content)
         log(f"本批次待办数量: {len(current_batch['todo'])}")
