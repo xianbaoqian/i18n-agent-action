@@ -1,5 +1,7 @@
 from openai import OpenAI
-
+from metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED 
+from utils import log
+import time
 
 class clientInfo:
     def __init__(
@@ -67,23 +69,55 @@ class clientInfo:
         print(f"  Model: {self._model}")
         print(f"  Dry Run: {self._dryRun}")
 
-    def talk_to_LLM(self, messages):
+    def talk(self, messages, use_json=False):
+        log(f"Request to LLM - Messages: {messages}")
         if not self._dryRun:
-            response = self._client.chat.completions.create(
-                model=self._model, messages=messages, stream=False
-            )
+            start_time = time.time()
+            
+            # Prepare the request parameters
+            request_params = {
+                "model": self._model,
+                "messages": messages,
+                "stream": False
+            }
+            
+            # Add JSON response format if requested
+            if use_json:
+                request_params["response_format"] = {"type": "json_object"}
+            
+            # Make the API call
+            response = self._client.chat.completions.create(**request_params)
+            duration = time.time() - start_time
+            LLM_RESPONSE_TIME.observe(duration)
+
+            # Handle token usage metrics
+            if response.usage:
+                # If we have usage data, use accurate values
+                prompt_tokens = response.usage.prompt_tokens
+                completion_tokens = response.usage.completion_tokens
+                total_tokens = response.usage.total_tokens
+                LLM_TOKENS_USED.labels(model=self._model, type='prompt').inc(prompt_tokens)
+                LLM_TOKENS_USED.labels(model=self._model, type='completion').inc(completion_tokens)
+                LLM_TOKENS_USED.labels(model=self._model, type='total').inc(total_tokens)
+            else:
+                # Otherwise estimate token count for the response content
+                content = response.choices[0].message.content
+                char_count = len(content) 
+                LLM_TOKENS_USED.labels(model=self._model, type='char_count').inc(char_count)
+                # Note: You might want to add token estimation logic here
+                # Currently this just increments total_tokens which isn't defined
+                # You might want to use something like:
+                # estimated_tokens = len(content.split()) // 0.75  # Rough estimation
+                # LLM_TOKENS_USED.labels(model=self._model, type='total').inc(estimated_tokens)
+                pass
+                
             return response
         else:
             return None
 
+
+    def talk_to_LLM(self, messages):
+        return self.talk(messages, False)
+
     def talk_to_LLM_Json(self, messages):
-        if not self._dryRun:
-            response = self._client.chat.completions.create(
-                model=self._model,
-                messages=messages,
-                stream=False,
-                response_format={"type": "json_object"},
-            )
-            return response
-        else:
-            return None
+        return self.talk(messages, True)

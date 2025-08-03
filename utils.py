@@ -1,6 +1,6 @@
 import os
 import subprocess
-
+from pathlib import Path
 
 def validate_inputs(args):
     """
@@ -50,17 +50,6 @@ def validate_inputs(args):
 def log(msg):
     print(msg)
 
-
-def get_tree_output(directory="."):
-    try:
-        # 执行tree命令并捕获输出
-        result = subprocess.run(
-            ["tree", directory], capture_output=True, text=True, check=True
-        )
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"命令执行失败: {e}")
-        return None
-    except FileNotFoundError:
-        print("未找到tree命令，请确保已安装tree工具")
-        return None
+def get_all_files(directory):
+    path = Path(directory)
+    return [file.resolve() for file in path.rglob('*/*') if file.is_file()]
