@@ -2,9 +2,6 @@ name: Process Changed Markdown Files
 
 on:
   workflow_call:
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 jobs:
   process-markdown:
