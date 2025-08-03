@@ -1,15 +1,20 @@
 # As it's an AI Agent
+
 ## How it works
+
 ### Manual(for dev, or you should take your own security as it not running in sandbox)
+
 ```
 pip3 install -r ./requirements.txt
 export api_key={your_key}
 //python3 main.py {your config file} {your docs folder} {Reserved Word} {optional if you have a file list}
 python3 main.py {full_path_to_your_repo}/mkdocs.yml {full_path_to_your_repo}/docs kepler {optional if you have a file list}
 ```
+
 and you shoud run linting by yourself.
 
 ### Container(running in sandbox)
+
 ```
 docker run -it \
   -v path_to_your_repo:/workspace \
@@ -22,10 +27,13 @@ docker run -it \
   -e FILE_LIST="/workspace/docs/index.md" \
   ghcr.io/samyuan1990/i18n-agent-action:latest
 ```
+
 ### GHA
+
 I suggest you enable PR creation in project settng to make auto PR back.
 
 #### 1st init
+
 ```
 name: Manual i8n and PR Creation
 
@@ -65,7 +73,9 @@ jobs:
           base: main  # 目标分支
           draft: false
 ```
+
 #### after each PR
+
 ```
 name: Process Changed Markdown Files
 
@@ -127,6 +137,7 @@ jobs:
 ```  
 
 ## Inputs
+
 | Input Parameter | Required | Default Value | Description |
 |-----------------|----------|---------------|-------------|
 | `apikey`        | Yes      | -             | API key for the LLM service |
@@ -142,5 +153,6 @@ jobs:
 | `dryRun`        | No       | false             | Enable dry-run mode (simulates execution without making changes) |
 
 ## Tested communtiy/project
+
 - itself(https://github.com/SamYuan1990/i18n-agent-action/pull/15)
 - HAMi

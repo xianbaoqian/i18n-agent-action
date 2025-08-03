@@ -19,9 +19,9 @@ jobs:
     needs: image
     uses: ./.github/workflows/afterPush.yml
     if: |
-      contains(toJson(github.event.commits.*.modified), 'docs/') ||
-      contains(toJson(github.event.commits.*.added), 'docs/') ||
-      contains(toJson(github.event.commits.*.removed), 'docs/')
+      contains(toJson(github.event.commits.*.modified), 'docs/*') ||
+      contains(toJson(github.event.commits.*.added), 'docs/*') ||
+      contains(toJson(github.event.commits.*.removed), 'docs/*')
     secrets:
       API_KEY: ${{ secrets.API_KEY }}
 
