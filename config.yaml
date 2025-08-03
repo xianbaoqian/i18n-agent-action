@@ -5,7 +5,7 @@ prompts:
     - What's the naming rule or file path rule for i18n mapping between different language editions?
     
   json_schema: |
-    Please result in mapping as source file, support file.
+    Please result in mapping as default language file, target file.
     The empty json schema is:
     {
       "todo": []
@@ -14,8 +14,8 @@ prompts:
     {
       "todo": [
         {
-          "source_file": "/path_to_file",
-          "target_file": "/path_to_file_i18n",
+          "source_file": "/path_to_default_language_file",
+          "target_file": "/path_to_target_file",
           "target_language": "zh"
         }
       ]

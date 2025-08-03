@@ -1,6 +1,12 @@
-from prometheus_client import REGISTRY, Counter
+from prometheus_client import REGISTRY, Counter, Summary
 from prometheus_client.exposition import generate_latest
 
+LLM_RESPONSE_TIME = Summary(
+    "llm_response_time_seconds", "Time spent processing LLM requests"
+)
+LLM_TOKENS_USED = Counter(
+    "llm_tokens_used_total", "Total tokens used by LLM", ["model", "type"]
+)
 # 定义指标
 SOURCE_FILE_MISSING = Counter(
     "translation_source_file_missing_total",
