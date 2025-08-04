@@ -4,14 +4,9 @@ from utils import get_all_files, log
 
 
 ### Phase 1 missingfiles
-def filesscopes(
-    configfile_path, doc_folder, given_file_list, config, clientInfo, TranslationConfig
-):
-    with open(configfile_path, "r", encoding="utf-8") as file:
+def filesscopes(TranslationContext, LLM_Client):
+    with open(TranslationContext.configfile_path, "r", encoding="utf-8") as file:
         config_file_content = file.read()  # 读取全部内容为字符串
-
-    log(doc_folder)
-    # tree_list = get_tree_output(doc_folder)
 
     messages = [
         {
@@ -38,10 +33,11 @@ def filesscopes(
     messages.append(
         {
             "role": "user",
-            "content": config["prompts"]["config_analysis"] + config_file_content,
+            "content": LLM_Client.get_config()["prompts"]["config_analysis"]
+            + config_file_content,
         }
     )
-    if clientInfo.get_dryRun():
+    if LLM_Client.get_dryRun():
         log("dry Run model using cache")
         return {
             "todo": [
@@ -52,15 +48,17 @@ def filesscopes(
                 }
             ]
         }
-    response1 = clientInfo.talk_to_LLM(messages)
+    response1 = LLM_Client.talk_to_LLM(messages)
     answer1 = response1.choices[0].message.content
     log("问题1 回答:" + answer1)
     messages.append({"role": "user", "content": answer1})
 
-    filelist = [str(filepath) for filepath in get_all_files(doc_folder)]
+    filelist = [
+        str(filepath) for filepath in get_all_files(TranslationContext.doc_folder)
+    ]
 
-    if given_file_list:  # 检查是否非空
-        given_files = given_file_list.split(",")  # 拆分成列表
+    if TranslationContext.file_list:  # 检查是否非空
+        given_files = TranslationContext.file_list.split(",")  # 拆分成列表
         filelist = given_files + filelist  # 合并到最前面
     # 将filelist分批次处理，每批30个文件
     batch_size = 30
@@ -74,13 +72,13 @@ def filesscopes(
                     f"here is part {i//batch_size + 1} of file lists for docs folder\n"
                     + "\n".join(batch)
                     + "\n\ncould you please list missing translated documents in "
-                    + TranslationConfig.get_target_language()
+                    + TranslationContext.target_language
                     + " language?\n\n"
-                    + config["prompts"]["json_schema"]
+                    + LLM_Client.get_config()["prompts"]["json_schema"]
                 ),
             }
         )
-        response2 = clientInfo.talk_to_LLM_Json(messages)
+        response2 = LLM_Client.talk_to_LLM_Json(messages)
         log(
             f"问题2 回答(批次 {i//batch_size + 1}):"
             + response2.choices[0].message.content
@@ -89,7 +87,7 @@ def filesscopes(
         current_batch = json.loads(response2.choices[0].message.content)
         log(f"本批次待办数量: {len(current_batch['todo'])}")
         all_todos.extend(current_batch["todo"])
-        if len(all_todos) > TranslationConfig.get_max_files():
+        if len(all_todos) > LLM_Client.get_max_files():
             break
     # log(json_todo_list["todo"][0])
     json_todo_list = {"todo": all_todos}
