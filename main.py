@@ -3,8 +3,8 @@ import sys
 
 import yaml
 from clientInfo import clientInfo
-from flowOne import givenfiles, missingfiles
-from flowTwo import flowtwo
+from filesscopes import filesscopes
+from translate import translate
 from metric import print_metrics
 from transcontrol import TranslationConfig
 from utils import log, validate_inputs
@@ -40,23 +40,18 @@ except ValueError as e:
     )
     sys.exit(1)
 
-
+file_list = args[4] if len(args) > 4 else None
+log(file_list)
 ## Workflow 1 missing files
 ### Phase 1
-json_todo_list = missingfiles(
-    configfile_path, doc_folder, config, Info, TranslationConfig
+json_todo_list = filesscopes(
+    configfile_path, doc_folder, file_list, 
+    config, Info, TranslationConfig
 )
 ### Phase 2
-flowtwo(json_todo_list, reserved_word, doc_folder, config, Info, False)
-## Workflow 2
-### Phase 1
-if len(args) > 4:
-    file_list = args[4]
-    log(file_list)
-    json_todo_list = givenfiles(
-        configfile_path, file_list, config, Info, TranslationConfig
-    )
-    ### Phase 2
-    flowtwo(json_todo_list, reserved_word, doc_folder, config, Info)
+translate(
+    json_todo_list, reserved_word, doc_folder, file_list,
+    config, Info)
 
+### show metrics
 print_metrics()

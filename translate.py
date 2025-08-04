@@ -22,7 +22,8 @@ def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
 # 定义处理函数
 #### todo if there is a existing file, then skip
 def translate_element(
-    reserved_word, doc_folder, element, config, clientInfo, force_refresh: bool = True
+    reserved_word, doc_folder, given_files, element,  
+    config, clientInfo
 ):
     TRANSLATION_REQUESTS.labels(
         reserved_word=reserved_word,
@@ -51,6 +52,13 @@ def translate_element(
     target_file = element["target_file"]
     if doc_folder not in target_file:
         target_file = doc_folder + "/" + target_file
+
+    force_refresh = False
+    if not given_files:
+        force_refresh = False
+    else:
+        files_list = [f.strip() for f in given_files.split(",")]
+        force_refresh = source_file in files_list
 
     if not should_refresh(target_file, force_refresh):
         log("skip file as target already there," + target_file)
@@ -132,13 +140,13 @@ def translate_element(
 
 
 ### Phase 2
-def flowtwo(
+def translate(
     json_todo_list,
     reserved_word,
     doc_folder,
+    gvien_file_list,
     config,
     clientInfo,
-    force_refresh: bool = True,
 ):
     total = len(json_todo_list["todo"])
     if clientInfo.get_dryRun():
@@ -157,7 +165,9 @@ def flowtwo(
         try:
             log("processing...one file")
             translate_element(
-                reserved_word, doc_folder, item, config, clientInfo, force_refresh
+                reserved_word, doc_folder, gvien_file_list,
+                item,
+                config, clientInfo
             )
         finally:
             with counter_lock:
