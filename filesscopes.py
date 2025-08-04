@@ -4,8 +4,9 @@ from utils import get_all_files, log
 
 
 ### Phase 1 missingfiles
-def filesscopes(configfile_path, doc_folder, given_file_list, 
-                    config, clientInfo, TranslationConfig):
+def filesscopes(
+    configfile_path, doc_folder, given_file_list, config, clientInfo, TranslationConfig
+):
     with open(configfile_path, "r", encoding="utf-8") as file:
         config_file_content = file.read()  # 读取全部内容为字符串
 

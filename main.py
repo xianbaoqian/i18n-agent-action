@@ -4,9 +4,9 @@ import sys
 import yaml
 from clientInfo import clientInfo
 from filesscopes import filesscopes
-from translate import translate
 from metric import print_metrics
 from transcontrol import TranslationConfig
+from translate import translate
 from utils import log, validate_inputs
 
 with open("config.yaml", "r", encoding="utf-8") as f:
@@ -45,13 +45,10 @@ log(file_list)
 ## Workflow 1 missing files
 ### Phase 1
 json_todo_list = filesscopes(
-    configfile_path, doc_folder, file_list, 
-    config, Info, TranslationConfig
+    configfile_path, doc_folder, file_list, config, Info, TranslationConfig
 )
 ### Phase 2
-translate(
-    json_todo_list, reserved_word, doc_folder, file_list,
-    config, Info)
+translate(json_todo_list, reserved_word, doc_folder, file_list, config, Info)
 
 ### show metrics
 print_metrics()

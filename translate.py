@@ -22,8 +22,7 @@ def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
 # 定义处理函数
 #### todo if there is a existing file, then skip
 def translate_element(
-    reserved_word, doc_folder, given_files, element,  
-    config, clientInfo
+    reserved_word, doc_folder, given_files, element, config, clientInfo
 ):
     TRANSLATION_REQUESTS.labels(
         reserved_word=reserved_word,
@@ -165,9 +164,7 @@ def translate(
         try:
             log("processing...one file")
             translate_element(
-                reserved_word, doc_folder, gvien_file_list,
-                item,
-                config, clientInfo
+                reserved_word, doc_folder, gvien_file_list, item, config, clientInfo
             )
         finally:
             with counter_lock:
