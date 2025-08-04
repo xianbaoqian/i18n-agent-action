@@ -21,11 +21,9 @@ def should_refresh(target_file: str, force_refresh: bool = False) -> bool:
 
 # 定义处理函数
 #### todo if there is a existing file, then skip
-def translate_element(
-    reserved_word, doc_folder, given_files, element, config, clientInfo
-):
+def translate_element(TranslationContext, element, LLM_Client):
     TRANSLATION_REQUESTS.labels(
-        reserved_word=reserved_word,
+        reserved_word=TranslationContext.reserved_word,
         target_language=element["target_language"],
         status="started",
     ).inc()
@@ -33,39 +31,41 @@ def translate_element(
     log(f"processing: {element}")
 
     source_file = element["source_file"]
-    if doc_folder not in source_file:
-        source_file = doc_folder + "/" + source_file
+    if TranslationContext.doc_folder not in source_file:
+        source_file = TranslationContext.doc_folder + "/" + source_file
 
     if not os.path.exists(source_file):
         log("skip as source file missing file " + source_file)
         SOURCE_FILE_MISSING.labels(
-            reserved_word=reserved_word, target_language=element["target_language"]
+            reserved_word=TranslationContext.reserved_word,
+            target_language=element["target_language"],
         ).inc()
         TRANSLATION_REQUESTS.labels(
-            reserved_word=reserved_word,
+            reserved_word=TranslationContext.reserved_word,
             target_language=element["target_language"],
             status="source_missing",
         ).inc()
         return
 
     target_file = element["target_file"]
-    if doc_folder not in target_file:
-        target_file = doc_folder + "/" + target_file
+    if TranslationContext.doc_folder not in target_file:
+        target_file = TranslationContext.doc_folder + "/" + target_file
 
     force_refresh = False
-    if not given_files:
+    if not TranslationContext.file_list:
         force_refresh = False
     else:
-        files_list = [f.strip() for f in given_files.split(",")]
+        files_list = [f.strip() for f in TranslationContext.file_list.split(",")]
         force_refresh = source_file in files_list
 
     if not should_refresh(target_file, force_refresh):
         log("skip file as target already there," + target_file)
         TARGET_FILE_EXISTS.labels(
-            reserved_word=reserved_word, target_language=element["target_language"]
+            reserved_word=TranslationContext.reserved_word,
+            target_language=element["target_language"],
         ).inc()
         TRANSLATION_REQUESTS.labels(
-            reserved_word=reserved_word,
+            reserved_word=TranslationContext.reserved_word,
             target_language=element["target_language"],
             status="target_exists",
         ).inc()
@@ -89,11 +89,14 @@ def translate_element(
         log(f"Processing chunk {i+1}/{len(chunks)} of {source_file}")
 
         messages = [
-            {"role": "system", "content": config["prompts"]["translator"]},
+            {
+                "role": "system",
+                "content": LLM_Client.get_config()["prompts"]["translator"],
+            },
             {
                 "role": "user",
                 "content": f"""
-    Please help translate the following content into {target_language}, reserved word: {reserved_word} in English.
+    Please help translate the following content into {target_language}, reserved word: {TranslationContext.reserved_word} in English.
     This is part {i+1} of {len(chunks)} of the document.
 
     Example json output format:
@@ -108,21 +111,21 @@ def translate_element(
             },
         ]
         try:
-            response = clientInfo.talk_to_LLM_Json(messages)
+            response = LLM_Client.talk_to_LLM_Json(messages)
             translated_chunks.append(
                 json.loads(response.choices[0].message.content)["content"]
             )
         except Exception as e:
             log(f"Error translating chunk {i+1}: {str(e)}")
             TRANSLATION_REQUESTS.labels(
-                reserved_word=reserved_word,
+                reserved_word=TranslationContext.reserved_word,
                 target_language=target_language,
                 status="error",
             ).inc()
             raise
 
     # Combine all translated chunks
-    output_content = "\n".join(translated_chunks) + "\n " + clientInfo.get_legal_info()
+    output_content = "\n".join(translated_chunks) + "\n " + LLM_Client.get_legal_info()
 
     log("translated " + target_file)
     os.makedirs(os.path.dirname(target_file), exist_ok=True)
@@ -131,24 +134,23 @@ def translate_element(
 
     # Record successful translation metrics
     FILES_TRANSLATED.labels(
-        reserved_word=reserved_word, target_language=target_language
+        reserved_word=TranslationContext.reserved_word, target_language=target_language
     ).inc()
     TRANSLATION_REQUESTS.labels(
-        reserved_word=reserved_word, target_language=target_language, status="success"
+        reserved_word=TranslationContext.reserved_word,
+        target_language=target_language,
+        status="success",
     ).inc()
 
 
 ### Phase 2
 def translate(
     json_todo_list,
-    reserved_word,
-    doc_folder,
-    gvien_file_list,
-    config,
-    clientInfo,
+    TranslationContext,
+    LLM_Client,
 ):
     total = len(json_todo_list["todo"])
-    if clientInfo.get_dryRun():
+    if LLM_Client.get_dryRun():
         log("dry Run model skip")
         return
 
@@ -163,9 +165,7 @@ def translate(
         nonlocal completed
         try:
             log("processing...one file")
-            translate_element(
-                reserved_word, doc_folder, gvien_file_list, item, config, clientInfo
-            )
+            translate_element(TranslationContext, item, LLM_Client)
         finally:
             with counter_lock:
                 completed += 1
