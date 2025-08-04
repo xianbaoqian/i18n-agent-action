@@ -1,5 +1,5 @@
-from typing import List, Optional
-import os
+from typing import Optional
+
 
 class TranslationContext:
     def __init__(
@@ -12,7 +12,7 @@ class TranslationContext:
     ):
         """
         初始化翻译上下文对象
-        
+
         参数:
             target_language (str): 目标语言代码 (如 'zh', 'fr')
             file_list (str, optional): 逗号分隔的文件列表字符串
@@ -64,7 +64,7 @@ class TranslationContext:
     def show_config(self) -> None:
         """
         显示当前配置信息
-        
+
         参数:
             verbose (bool): 是否显示详细路径信息，默认为False
         """
@@ -74,4 +74,3 @@ class TranslationContext:
         print(f"  configfile path: {self._configfile_path}")
         print(f"  doc folder: {self._doc_folder}")
         print(f"  reserved words: {self._reserved_word}")
-    
