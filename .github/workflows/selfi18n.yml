@@ -3,7 +3,7 @@ name: Manual i8n and PR Creation
 permissions:
   contents: write
   pull-requests: write
-  models: read
+  #models: read
 
 on:
   workflow_dispatch:  # 允许手动触发
@@ -22,9 +22,10 @@ jobs:
         id: use-action
         uses: SamYuan1990/i18n-agent-action@main
         with:
-          apikey: ${{ secrets.GITHUB_TOKEN }} 
-          base_url: https://models.github.ai/inference
-          model: deepseek/DeepSeek-V3-0324
+          #apikey: ${{ secrets.GITHUB_TOKEN }} 
+          #base_url: https://models.github.ai/inference
+          #model: deepseek/DeepSeek-V3-0324
+          apikey: ${{ secrets.API_KEY }}
           RESERVED_WORD: i18n-agent-action
           DOCS_FOLDER: /workspace/docs
           CONFIG_FILE: /workspace/mkdocs.yml
