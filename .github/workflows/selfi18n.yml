@@ -3,6 +3,7 @@ name: Manual i8n and PR Creation
 permissions:
   contents: write
   pull-requests: write
+  models: read
 
 on:
   workflow_dispatch:  # 允许手动触发
@@ -21,11 +22,15 @@ jobs:
         id: use-action
         uses: SamYuan1990/i18n-agent-action@main
         with:
-          apikey: ${{ secrets.API_KEY }}
+          apikey: ${{ secrets.GITHUB_TOKEN }} 
+          base_url: https://models.github.ai/inference/chat/completions
+          model: "DeepSeek-V3-0324"
           RESERVED_WORD: i18n-agent-action
           DOCS_FOLDER: /workspace/docs
           CONFIG_FILE: /workspace/mkdocs.yml
           workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
+          FILE_LIST: /workspace/docs/index.md
+          target_language: zh
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
