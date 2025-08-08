@@ -36,8 +36,6 @@ jobs:
           separator: ","
           files: |
             docs/**/*.md
-          files_ignore: |
-            docs/**/*.*.md  # 匹配所有语言变体
 
       - name: Add prefix to each file
         if: steps.changed-files.outputs.all_changed_files != '' && steps.check-committer.outputs.is_bot_commit == 'false'

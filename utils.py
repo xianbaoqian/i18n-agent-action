@@ -53,4 +53,4 @@ def log(msg):
 
 def get_all_files(directory):
     path = Path(directory)
-    return [file.resolve() for file in path.rglob("*/*") if file.is_file()]
+    return [file.resolve() for file in path.rglob("**/*.md") if file.is_file()]
