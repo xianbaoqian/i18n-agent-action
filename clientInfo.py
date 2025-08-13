@@ -113,8 +113,16 @@ class clientInfo:
             if response.usage:
                 # If we have usage data, use accurate values
                 prompt_tokens = response.usage.prompt_tokens
+                prompt_cache_hit_tokens = response.usage.prompt_cache_hit_tokens
+                prompt_cache_miss_tokens = response.usage.prompt_cache_miss_tokens
                 completion_tokens = response.usage.completion_tokens
                 total_tokens = response.usage.total_tokens
+                LLM_TOKENS_USED.labels(model=self._model, type="prompt_cache_hit").inc(
+                    prompt_cache_hit_tokens
+                )
+                LLM_TOKENS_USED.labels(model=self._model, type="prompt_cache_miss").inc(
+                    prompt_cache_miss_tokens
+                )
                 LLM_TOKENS_USED.labels(model=self._model, type="prompt").inc(
                     prompt_tokens
                 )
