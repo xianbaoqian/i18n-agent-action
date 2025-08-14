@@ -1,8 +1,10 @@
 import time
+
 import yaml
+from deepseek_tokenizer import tokenizer
 from metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 from openai import OpenAI
-from deepseek_tokenizer import tokenizer
+
 
 class clientInfo:
     def __init__(
@@ -139,7 +141,7 @@ class clientInfo:
             return response
         else:
             LLM_TOKENS_USED.labels(model=self._model, type="char_count").inc(
-                    tokenizer(str(messages))
+                tokenizer(str(messages))
             )
             return None
 

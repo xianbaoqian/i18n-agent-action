@@ -9,7 +9,7 @@ class TranslationContext:
         configfile_path: Optional[str] = None,
         doc_folder: Optional[str] = None,
         reserved_word: Optional[str] = None,
-        max_files: Optional = int
+        max_files: Optional = int,
     ):
         """
         初始化翻译上下文对象
@@ -29,7 +29,8 @@ class TranslationContext:
         try:
             self._max_files = int(max_files)
         except ValueError:
-            self._max_files = 20    
+            self._max_files = 20
+
     # ----------------------
     # 属性访问器 (使用 @property)
     # ----------------------
