@@ -87,7 +87,7 @@ def filesscopes(TranslationContext, LLM_Client):
         current_batch = json.loads(response2.choices[0].message.content)
         log(f"本批次待办数量: {len(current_batch['todo'])}")
         all_todos.extend(current_batch["todo"])
-        if len(all_todos) > LLM_Client.get_max_files():
+        if len(all_todos) > TranslationContext.max_files:
             break
     # log(json_todo_list["todo"][0])
     json_todo_list = {"todo": all_todos}

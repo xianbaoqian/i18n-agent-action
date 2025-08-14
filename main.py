@@ -14,7 +14,6 @@ LLM_Client = clientInfo(
     base_url=os.getenv("base_url", "https://api.deepseek.com"),
     model=os.getenv("model", "deepseek-chat"),
     dryRun=os.getenv("dryRun", False),
-    max_files=os.getenv("max_files", 20),
 )
 LLM_Client.show_config()
 
@@ -40,6 +39,7 @@ context = TranslationContext(
     configfile_path=configfile_path,
     doc_folder=doc_folder,
     reserved_word=reserved_word,
+    max_files=os.getenv("max_files", 20),
 )
 context.show_config()
 ## Workflow 1 missing files

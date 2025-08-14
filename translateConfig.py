@@ -9,6 +9,7 @@ class TranslationContext:
         configfile_path: Optional[str] = None,
         doc_folder: Optional[str] = None,
         reserved_word: Optional[str] = None,
+        max_files: Optional = int
     ):
         """
         初始化翻译上下文对象
@@ -25,7 +26,10 @@ class TranslationContext:
         self._configfile_path = configfile_path
         self._doc_folder = doc_folder
         self._reserved_word = reserved_word
-
+        try:
+            self._max_files = int(max_files)
+        except ValueError:
+            self._max_files = 20    
     # ----------------------
     # 属性访问器 (使用 @property)
     # ----------------------
@@ -61,6 +65,10 @@ class TranslationContext:
         """获取保留字/关键词"""
         return self._reserved_word
 
+    @property
+    def max_files(self) -> int:
+        return self._max_files
+
     def show_config(self) -> None:
         """
         显示当前配置信息
@@ -74,3 +82,4 @@ class TranslationContext:
         print(f"  configfile path: {self._configfile_path}")
         print(f"  doc folder: {self._doc_folder}")
         print(f"  reserved words: {self._reserved_word}")
+        print(f"  max doc limits: {self._max_files}")

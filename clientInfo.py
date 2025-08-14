@@ -1,10 +1,8 @@
 import time
-
 import yaml
 from metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 from openai import OpenAI
-from utils import log
-
+from deepseek_tokenizer import tokenizer
 
 class clientInfo:
     def __init__(
@@ -13,7 +11,6 @@ class clientInfo:
         base_url="https://api.example.com",
         model="gpt-4",
         dryRun=False,
-        max_files=20,
     ):
         """
         初始化ApiClient
@@ -27,11 +24,6 @@ class clientInfo:
         self._api_key = api_key
         self._base_url = base_url
         self._model = model
-        try:
-            self._max_files = int(max_files)
-        except ValueError:
-            self._max_files = 20
-            print(f"警告: MAX_FILES 环境变量值无效，使用默认值 {self._max_files}")
         with open("config.yaml", "r", encoding="utf-8") as f:
             self._config = yaml.safe_load(f)
         # 鲁棒性处理dryRun参数
@@ -75,10 +67,6 @@ class clientInfo:
     def get_config(self):
         return self._config
 
-    def get_max_files(self):
-        """max files"""
-        return self._max_files
-
     # 可选：添加一个显示所有配置的方法
     def show_config(self):
         """显示当前配置"""
@@ -86,10 +74,9 @@ class clientInfo:
         print(f"  Base URL: {self._base_url}")
         print(f"  Model: {self._model}")
         print(f"  Dry Run: {self._dryRun}")
-        print(f"  max_files: {self._max_files}")
 
     def talk(self, messages, use_json=False):
-        log(f"Request to LLM - Messages: {messages}")
+        print(f"Request to LLM - Messages: {messages}")
         if not self._dryRun:
             start_time = time.time()
 
@@ -117,6 +104,9 @@ class clientInfo:
                 prompt_cache_miss_tokens = response.usage.prompt_cache_miss_tokens
                 completion_tokens = response.usage.completion_tokens
                 total_tokens = response.usage.total_tokens
+                LLM_TOKENS_USED.labels(model=self._model, type="char_count").inc(
+                    tokenizer(str(messages))
+                )
                 LLM_TOKENS_USED.labels(model=self._model, type="prompt_cache_hit").inc(
                     prompt_cache_hit_tokens
                 )
@@ -148,6 +138,9 @@ class clientInfo:
 
             return response
         else:
+            LLM_TOKENS_USED.labels(model=self._model, type="char_count").inc(
+                    tokenizer(str(messages))
+            )
             return None
 
     def talk_to_LLM(self, messages):
