@@ -1,6 +1,7 @@
 import json
 import os
 import threading
+import logging
 
 from metric import (
     FILES_TRANSLATED,
@@ -102,7 +103,8 @@ def translate_element(TranslationContext, element, LLM_Client):
     Example json output format:
     {{
         "content": "translated text here...",
-        "metadata": {{"chunk": {i+1}, "total": {len(chunks)}}}
+        "metadata": {{"chunk": {i+1}, "total": {len(chunks)}}},
+        "proper_nouns": "proper nouns 0, "proper nouns 1..."
     }}
 
     Content to translate:
@@ -115,6 +117,7 @@ def translate_element(TranslationContext, element, LLM_Client):
             translated_chunks.append(
                 json.loads(response.choices[0].message.content)["content"]
             )
+            logging.info(json.loads((response.choices[0].message.content))["proper_nouns"])
         except Exception as e:
             log(f"Error translating chunk {i+1}: {str(e)}")
             TRANSLATION_REQUESTS.labels(

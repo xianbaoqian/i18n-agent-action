@@ -48,4 +48,5 @@ prompts:
     - Ensure code syntax, commands, and technical examples remain functional
     - Check that formatting and document structure are preserved
     - Confirm that the translated content maintains the same level of technical detail and accuracy
-    - When encountering ambiguous technical terms, provide brief explanations in parentheses (please reference provided reserved word from user)
+    - Please keep any proper nouns you found.
+    - When encountering ambiguous technical terms or proper nouns, provide brief explanations in parentheses (please reference provided reserved word from user)

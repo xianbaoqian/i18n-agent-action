@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 from clientInfo import clientInfo
 from filesscopes import filesscopes
@@ -7,6 +8,13 @@ from metric import print_metrics
 from translate import translate
 from translateConfig import TranslationContext
 from utils import log, validate_inputs
+from ExpiringDictStorage import ExpiringDictStorage
+
+logging.basicConfig(
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        level=logging.INFO
+    )
+storage = ExpiringDictStorage(expiry_days=7)
 
 ## system
 LLM_Client = clientInfo(
@@ -14,6 +22,8 @@ LLM_Client = clientInfo(
     base_url=os.getenv("base_url", "https://api.deepseek.com"),
     model=os.getenv("model", "deepseek-chat"),
     dryRun=os.getenv("dryRun", False),
+    local_cache=storage,
+    usecache=os.getenv("usecache", True),
 )
 LLM_Client.show_config()
 

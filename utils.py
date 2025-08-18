@@ -1,4 +1,6 @@
 import os
+import logging
+
 from pathlib import Path
 
 
@@ -48,7 +50,7 @@ def validate_inputs(args):
 
 
 def log(msg):
-    print(msg)
+    logging.info(msg)
 
 
 def get_all_files(directory):
