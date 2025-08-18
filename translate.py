@@ -1,7 +1,7 @@
 import json
+import logging
 import os
 import threading
-import logging
 
 from metric import (
     FILES_TRANSLATED,
@@ -117,7 +117,9 @@ def translate_element(TranslationContext, element, LLM_Client):
             translated_chunks.append(
                 json.loads(response.choices[0].message.content)["content"]
             )
-            logging.info(json.loads((response.choices[0].message.content))["proper_nouns"])
+            logging.info(
+                json.loads((response.choices[0].message.content))["proper_nouns"]
+            )
         except Exception as e:
             log(f"Error translating chunk {i+1}: {str(e)}")
             TRANSLATION_REQUESTS.labels(

@@ -1,11 +1,12 @@
-import time
-import yaml
-import logging
 import hashlib
+import logging
+import time
 
+import yaml
+from deepseek_tokenizer import tokenizer
 from metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 from openai import OpenAI
-from deepseek_tokenizer import tokenizer
+
 
 class clientInfo:
     def __init__(
@@ -86,10 +87,10 @@ class clientInfo:
         if self._usecache:
             logging.info(f"Checking cache for Messages: {messages}")
             # todo
-            key = hashlib.sha256(str(messages).encode('utf-8')).hexdigest()
+            key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
             if key in self._local_cache:
                 return self._local_cache.get(key)
-        # return 
+        # return
 
         logging.info(f"Request to LLM - Messages: {messages}")
         if not self._dryRun:
@@ -112,8 +113,8 @@ class clientInfo:
             LLM_RESPONSE_TIME.observe(duration)
             # Add into cache
             if self._usecache:
-                #todo
-                key = hashlib.sha256(str(messages).encode('utf-8')).hexdigest()
+                # todo
+                key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
                 self._local_cache[key] = response
             # Handle token usage metrics
             if response.usage:
@@ -158,7 +159,7 @@ class clientInfo:
             return response
         else:
             LLM_TOKENS_USED.labels(model=self._model, type="char_count").inc(
-                    tokenizer(str(messages))
+                tokenizer(str(messages))
             )
             return None
 

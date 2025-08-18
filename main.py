@@ -1,19 +1,18 @@
+import logging
 import os
 import sys
-import logging
 
 from clientInfo import clientInfo
+from ExpiringDictStorage import ExpiringDictStorage
 from filesscopes import filesscopes
 from metric import print_metrics
 from translate import translate
 from translateConfig import TranslationContext
 from utils import log, validate_inputs
-from ExpiringDictStorage import ExpiringDictStorage
 
 logging.basicConfig(
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        level=logging.INFO
-    )
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 storage = ExpiringDictStorage(expiry_days=7)
 
 ## system

@@ -1,7 +1,7 @@
+import logging
+
 from prometheus_client import REGISTRY, Counter, Summary
 from prometheus_client.exposition import generate_latest
-
-import logging
 
 LLM_RESPONSE_TIME = Summary(
     "llm_response_time_seconds", "Time spent processing LLM requests"
