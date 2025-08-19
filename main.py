@@ -8,7 +8,7 @@ from filesscopes import filesscopes
 from metric import print_metrics
 from translate import translate
 from translateConfig import TranslationContext
-from utils import log, validate_inputs
+from utils import validate_inputs
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -29,12 +29,12 @@ LLM_Client.show_config()
 args = sys.argv
 try:
     configfile_path, doc_folder, reserved_word = validate_inputs(args)
-    log(
+    logging.info(
         f"Config: {configfile_path}, doc folder: {doc_folder}, reserved_word: {reserved_word}"
     )
 except ValueError as e:
-    log(f"错误: {e}", file=sys.stderr)
-    log(
+    logging.info(f"错误: {e}", file=sys.stderr)
+    logging.info(
         "用法: python script.py <configfile_path> <doc_folder> <reserved_word>",
         file=sys.stderr,
     )

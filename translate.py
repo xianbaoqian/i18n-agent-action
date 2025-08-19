@@ -9,7 +9,7 @@ from metric import (
     TARGET_FILE_EXISTS,
     TRANSLATION_REQUESTS,
 )
-from utils import log
+from proper_nouns_handle import MergePN
 
 
 #
@@ -29,14 +29,14 @@ def translate_element(TranslationContext, element, LLM_Client):
         status="started",
     ).inc()
 
-    log(f"processing: {element}")
+    logging.info(f"processing: {element}")
 
     source_file = element["source_file"]
     if TranslationContext.doc_folder not in source_file:
         source_file = TranslationContext.doc_folder + "/" + source_file
 
     if not os.path.exists(source_file):
-        log("skip as source file missing file " + source_file)
+        logging.info("skip as source file missing file " + source_file)
         SOURCE_FILE_MISSING.labels(
             reserved_word=TranslationContext.reserved_word,
             target_language=element["target_language"],
@@ -60,7 +60,7 @@ def translate_element(TranslationContext, element, LLM_Client):
         force_refresh = source_file in files_list
 
     if not should_refresh(target_file, force_refresh):
-        log("skip file as target already there," + target_file)
+        logging.info("skip file as target already there," + target_file)
         TARGET_FILE_EXISTS.labels(
             reserved_word=TranslationContext.reserved_word,
             target_language=element["target_language"],
@@ -87,8 +87,8 @@ def translate_element(TranslationContext, element, LLM_Client):
 
     translated_chunks = []
     for i, chunk in enumerate(chunks):
-        log(f"Processing chunk {i+1}/{len(chunks)} of {source_file}")
-
+        logging.info(f"Processing chunk {i+1}/{len(chunks)} of {source_file}")
+        PN = TranslationContext.reserved_word
         messages = [
             {
                 "role": "system",
@@ -97,7 +97,7 @@ def translate_element(TranslationContext, element, LLM_Client):
             {
                 "role": "user",
                 "content": f"""
-    Please help translate the following content into {target_language}, reserved word: {TranslationContext.reserved_word} in English.
+    Please help translate the following content into {target_language}, reserved word: { PN } in English.
     This is part {i+1} of {len(chunks)} of the document.
 
     Example json output format:
@@ -120,8 +120,12 @@ def translate_element(TranslationContext, element, LLM_Client):
             logging.info(
                 json.loads((response.choices[0].message.content))["proper_nouns"]
             )
+            # self evaluate for proper_nouns
+            PN = MergePN(
+                PN, json.loads((response.choices[0].message.content))["proper_nouns"]
+            )
         except Exception as e:
-            log(f"Error translating chunk {i+1}: {str(e)}")
+            logging.info(f"Error translating chunk {i+1}: {str(e)}")
             TRANSLATION_REQUESTS.labels(
                 reserved_word=TranslationContext.reserved_word,
                 target_language=target_language,
@@ -134,7 +138,7 @@ def translate_element(TranslationContext, element, LLM_Client):
     if TranslationContext.disclaimers:
         output_content = output_content + "\n\n " + LLM_Client.get_legal_info()
 
-    log("translated " + target_file)
+    logging.info("translated " + target_file)
     os.makedirs(os.path.dirname(target_file), exist_ok=True)
     with open(target_file, "w", encoding="utf-8") as file:
         file.write(output_content)
@@ -158,7 +162,7 @@ def translate(
 ):
     total = len(json_todo_list["todo"])
     if LLM_Client.get_dryRun():
-        log("dry Run model skip")
+        logging.info("dry Run model skip")
         return
 
     # Create a list to hold our threads
@@ -171,13 +175,13 @@ def translate(
     def worker(item):
         nonlocal completed
         try:
-            log("processing...one file")
+            logging.info("processing...one file")
             translate_element(TranslationContext, item, LLM_Client)
         finally:
             with counter_lock:
                 completed += 1
                 remaining = total - completed
-                log(f"todo: {remaining}")
+                logging.info(f"todo: {remaining}")
 
     # Create and start threads
     for item in json_todo_list["todo"]:
@@ -189,4 +193,4 @@ def translate(
     for thread in threads:
         thread.join()
 
-    log("All tasks completed")
+    logging.info("All tasks completed")

@@ -1,4 +1,3 @@
-import logging
 import os
 from pathlib import Path
 
@@ -46,10 +45,6 @@ def validate_inputs(args):
     #    raise ValueError("保留字不能为空")
 
     return configfile_path, doc_folder, reserved_word
-
-
-def log(msg):
-    logging.info(msg)
 
 
 def get_all_files(directory):
