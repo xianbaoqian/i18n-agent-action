@@ -49,6 +49,7 @@ context = TranslationContext(
     doc_folder=doc_folder,
     reserved_word=reserved_word,
     max_files=os.getenv("max_files", 20),
+    disclaimers=os.gentenv("disclaimers", True),
 )
 context.show_config()
 ## Workflow 1 missing files

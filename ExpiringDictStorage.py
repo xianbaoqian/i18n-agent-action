@@ -49,8 +49,11 @@ class ExpiringDictStorage:
         with open(self.filename, "w") as f:
             json.dump(data, f, indent=2)
 
-    def get(self, key):
-        """获取值"""
+    def get(self, key, update_timestamp=True):
+        """获取值
+        :param key: 要获取的键
+        :param update_timestamp: 是否更新访问时间戳，默认为True
+        """
         with self.lock:
             if key not in self.data["data"]:
                 return None
@@ -58,10 +61,15 @@ class ExpiringDictStorage:
             item = self.data["data"][key]
             value = item["value"]
 
+            # 如果配置为更新时间戳，则更新
+            if update_timestamp:
+                item["timestamp"] = time.time()
+                self._save_data(self.data)
+
             if item.get("_type") == "ChatCompletion":
                 return ChatCompletion.model_validate_json(value)
             else:
-                return self.data["data"].get(key, {}).get("value")
+                return value
 
     def set(self, key, value):
         """设置值"""

@@ -1,4 +1,10 @@
-# As it's an AI Agent
+# I am an i18n AI Agent
+
+To promote knowledge sharing and make our technology and projects more accessible to global audiences, we permit the use of large language models (LLMs) or generative AI for translating our documentation and community meeting notes.
+
+Prioritize resource efficiency: Rather than having readers repeatedly translate our content via LLMs for their own needs, we believe it is more sustainable for us, as maintainers, to provide unified translated versions.
+
+However, since we rely on cutting-edge AI translation technologies, we cannot guarantee absolute accuracy. If you encounter inconsistencies, please refer to the original English documentation and report any issues to the community for improvement.
 
 ## How it works
 
@@ -151,8 +157,13 @@ jobs:
 | `target_language` | No     | `'zh'`        | Target language code for translation (e.g., `'zh'` for Chinese) |
 | `max_files`     | No       | `'20'`        | Maximum number of files to process |
 | `dryRun`        | No       | false             | Enable dry-run mode (simulates execution without making changes) |
+| `usecache`      | No       | true             | Enable cache for LLM request |
+| `disclaimers`   | No       | true             | Show disclaimers at end of translate |
 
 ## Tested communtiy/project
 
-- itself(https://github.com/SamYuan1990/i18n-agent-action/pull/15)
+- [My Own](https://github.com/SamYuan1990/i18n-agent-action/pull/15)
 - HAMi
+- Huggingface Diffuser
+  - [PR](https://github.com/huggingface/diffusers/pull/12032)
+  - [PR](https://github.com/huggingface/diffusers/pull/12179)

@@ -130,7 +130,9 @@ def translate_element(TranslationContext, element, LLM_Client):
             raise
 
     # Combine all translated chunks
-    output_content = "\n".join(translated_chunks) + "\n " + LLM_Client.get_legal_info()
+    output_content = "\n".join(translated_chunks)
+    if TranslationContext.disclaimers:
+        output_content = output_content + "\n\n " + LLM_Client.get_legal_info()
 
     log("translated " + target_file)
     os.makedirs(os.path.dirname(target_file), exist_ok=True)

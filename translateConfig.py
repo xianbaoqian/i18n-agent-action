@@ -10,6 +10,7 @@ class TranslationContext:
         doc_folder: Optional[str] = None,
         reserved_word: Optional[str] = None,
         max_files: Optional = int,
+        disclaimers: Optional[bool] = True,
     ):
         """
         初始化翻译上下文对象
@@ -26,6 +27,7 @@ class TranslationContext:
         self._configfile_path = configfile_path
         self._doc_folder = doc_folder
         self._reserved_word = reserved_word
+        self._disclaimers = disclaimers
         try:
             self._max_files = int(max_files)
         except ValueError:
@@ -70,6 +72,10 @@ class TranslationContext:
     def max_files(self) -> int:
         return self._max_files
 
+    @property
+    def disclaimers(self) -> bool:
+        return self._disclaimers
+
     def show_config(self) -> None:
         """
         显示当前配置信息
@@ -84,3 +90,4 @@ class TranslationContext:
         print(f"  doc folder: {self._doc_folder}")
         print(f"  reserved words: {self._reserved_word}")
         print(f"  max doc limits: {self._max_files}")
+        print(f"  disclaimers: {self._disclaimers}")
