@@ -47,10 +47,6 @@ def validate_inputs(args):
     return configfile_path, doc_folder, reserved_word
 
 
-def log(msg):
-    print(msg)
-
-
 def get_all_files(directory):
     path = Path(directory)
     return [file.resolve() for file in path.rglob("**/*.md") if file.is_file()]

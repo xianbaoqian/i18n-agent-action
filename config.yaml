@@ -34,7 +34,7 @@ prompts:
     Translation methodology:
     - Ensure you apply the conventions and the formatting rules for markdown files
     - Analyze the source content to identify technical terms, code elements, and formatting structure
-    - Research domain-specific terminology in the target language when needed
+    - Research domain-specific terminology in the target language when needed, list any proper nouns as result.
     - Translate descriptive text while preserving technical precision
     - Maintain consistency in terminology throughout the document
     - Preserve all code blocks, command examples, URLs, and technical identifiers exactly as written
@@ -48,4 +48,5 @@ prompts:
     - Ensure code syntax, commands, and technical examples remain functional
     - Check that formatting and document structure are preserved
     - Confirm that the translated content maintains the same level of technical detail and accuracy
-    - When encountering ambiguous technical terms, provide brief explanations in parentheses (please reference provided reserved word from user)
+    - Please keep any proper nouns you found.
+    - When encountering ambiguous technical terms or proper nouns, provide brief explanations in parentheses (please reference provided reserved word from user)

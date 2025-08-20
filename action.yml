@@ -33,6 +33,10 @@ inputs:
     default: '20'
   dryRun:
     description: dryRun Option
+  usecache:
+    description: cache LLM response or not
+  disclaimers:
+    description: show disclaimers or not
 
 runs:
   using: 'composite'
@@ -62,6 +66,13 @@ runs:
         if [ -n "${{ inputs.model }}" ]; then
           DOCKER_CMD="$DOCKER_CMD -e model=${{ inputs.model }}"
         fi    
+        if [ -n "${{ inputs.disclaimers }}" ]; then
+          DOCKER_CMD="$DOCKER_CMD -e disclaimers=${{ inputs.disclaimers }}"
+        fi    
+        if [ -n "${{ inputs.usecache }}" ]; then
+          DOCKER_CMD="$DOCKER_CMD -e usecache=${{ inputs.usecache }}"
+        fi    
+      
         # 添加镜像名称并执行
         DOCKER_CMD="$DOCKER_CMD ghcr.io/samyuan1990/i18n-agent-action:latest"
         eval $DOCKER_CMD
