@@ -1,11 +1,13 @@
 # Self evaluation
 
-Thanks to 2507.21046v3
+Thanks to paper 2507.21046v3
 
 ## Design
 
 To make our translate agent self evaluate, we can try with auto detect proper nouns.
 The PR for this repo at [link](https://github.com/SamYuan1990/i18n-agent-action/pull/53)
+
+The core idea as prompt contains dynamic part as proper nouns, what if we ask LLM to auto detect new proper nouns and we merge them together in next round/chunk of tasks?
 
 ### 1st step Add a var to capture proper nouns from LLM
 
@@ -30,4 +32,5 @@ def MergePN(str1, str2):
 ```
 
 ### Result
-
+![](./img/selfevaluate.png)
+![](./img/selfevaluate2.png)

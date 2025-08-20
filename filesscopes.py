@@ -1,6 +1,7 @@
 import json
+import logging
 
-from utils import get_all_files, log
+from utils import get_all_files
 
 
 ### Phase 1 missingfiles
@@ -38,7 +39,7 @@ def filesscopes(TranslationContext, LLM_Client):
         }
     )
     if LLM_Client.get_dryRun():
-        log("dry Run model using cache")
+        logging.info("dry Run model using cache")
         return {
             "todo": [
                 {
@@ -50,7 +51,7 @@ def filesscopes(TranslationContext, LLM_Client):
         }
     response1 = LLM_Client.talk_to_LLM(messages)
     answer1 = response1.choices[0].message.content
-    log("问题1 回答:" + answer1)
+    logging.info("问题1 回答:" + answer1)
     messages.append({"role": "user", "content": answer1})
 
     filelist = [
@@ -79,17 +80,16 @@ def filesscopes(TranslationContext, LLM_Client):
             }
         )
         response2 = LLM_Client.talk_to_LLM_Json(messages)
-        log(
+        logging.info(
             f"问题2 回答(批次 {i//batch_size + 1}):"
             + response2.choices[0].message.content
         )
 
         current_batch = json.loads(response2.choices[0].message.content)
-        log(f"本批次待办数量: {len(current_batch['todo'])}")
+        logging.info(f"本批次待办数量: {len(current_batch['todo'])}")
         all_todos.extend(current_batch["todo"])
         if len(all_todos) > TranslationContext.max_files:
             break
-    # log(json_todo_list["todo"][0])
     json_todo_list = {"todo": all_todos}
-    log(f"总待办数量: {len(all_todos)}")
+    logging.info(f"总待办数量: {len(all_todos)}")
     return json_todo_list

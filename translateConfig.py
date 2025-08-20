@@ -27,7 +27,21 @@ class TranslationContext:
         self._configfile_path = configfile_path
         self._doc_folder = doc_folder
         self._reserved_word = reserved_word
-        self._disclaimers = disclaimers
+        """将各种类型的值转换为布尔值"""
+        if isinstance(disclaimers, bool):
+            self._disclaimers = disclaimers
+        elif isinstance(disclaimers, str):
+            normalized = disclaimers.strip().lower()
+            if normalized in ("true", "yes", "y", "1", "on"):
+                self._disclaimers = True
+            elif normalized in ("false", "no", "n", "0", "off", ""):
+                self._disclaimers = False
+            else:
+                raise ValueError(f"无法将字符串 '{disclaimers}' 转换为布尔值")
+        elif isinstance(disclaimers, (int, float)):
+            self._disclaimers = bool(disclaimers)
+        else:
+            self._disclaimers = True
         try:
             self._max_files = int(max_files)
         except ValueError:
