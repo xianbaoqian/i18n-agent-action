@@ -6,23 +6,22 @@ docs_dir: ./docs
 plugins:
   - i18n:
       docs_structure: suffix
-      default_language: en  # 添加默认语言设置
       languages:  # 改为字典格式
-        en:
+        - locale: en
           name: English
-          build: true
-        zh:
+          default: true
+        - locale: zh
           name: Chinese
           build: true
-        es:  # Español (西班牙语)
+        - locale: es  # Español (西班牙语)
           name: Español
           build: true
-        fr:  # Français (法语)
+        - locale: fr  # Français (法语)
           name: Français
           build: true
-        ja:  # 日本語 (日语)
+        - locale: ja  # 日本語 (日语)
           name: 日本語
           build: true
-        ar:  # العربية (阿拉伯语)
+        - locale: ar  # العربية (阿拉伯语)
           name: العربية
           build: true

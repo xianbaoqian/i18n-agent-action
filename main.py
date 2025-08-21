@@ -2,12 +2,13 @@ import logging
 import os
 import sys
 
-from clientInfo import clientInfo
-from ExpiringDictStorage import ExpiringDictStorage
-from filesscopes import filesscopes
-from metric import print_metrics
-from translate import translate
-from translateConfig import TranslationContext
+from AgentUtils.clientInfo import clientInfo
+from AgentUtils.ExpiringDictStorage import ExpiringDictStorage
+from AgentUtils.metric import print_metrics
+from AgentUtils.span import Span_Mgr
+from Business.filesscopes import filescopeAgent
+from Business.translate import translateAgent
+from Business.translateConfig import TranslationContext
 from utils import validate_inputs
 
 logging.basicConfig(
@@ -25,6 +26,8 @@ LLM_Client = clientInfo(
     usecache=os.getenv("usecache", True),
 )
 LLM_Client.show_config()
+span_mgr = Span_Mgr(storage)
+root_span = span_mgr.create_span("Root operation")
 
 args = sys.argv
 try:
@@ -49,15 +52,21 @@ context = TranslationContext(
     doc_folder=doc_folder,
     reserved_word=reserved_word,
     max_files=os.getenv("max_files", 20),
-    # todo disclaimers
     disclaimers=os.getenv("disclaimers", False),
 )
 context.show_config()
+FSAgent = filescopeAgent(LLM_Client, span_mgr)
+TsAgent = translateAgent(LLM_Client, span_mgr)
+### Start a span
 ## Workflow 1 missing files
 ### Phase 1
-json_todo_list = filesscopes(context, LLM_Client)
+json_todo_list = FSAgent.filesscopes(context, root_span)
 ### Phase 2
-translate(json_todo_list, context, LLM_Client)
+TsAgent.translate(json_todo_list, context, root_span)
+### Finish the span
+span_mgr.end_span(root_span.hash)
+### Display historical spans
 
 ### show metrics
 print_metrics()
+print(span_mgr.display_all_spans())

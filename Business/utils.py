@@ -1,7 +1,10 @@
 from collections import OrderedDict
+from pathlib import Path
 
-# str1 = "Diffusers, stable_diffusion, consisid, colab, diffusion"
-# str2 = "Diffusers, stable_diffusion, consisid, colab, diffusion, ModularPipeline, YiYiXu, modular-diffdiff, modular-diffdiff-0704, DiffDiffBlocks"
+
+def get_all_files(directory):
+    path = Path(directory)
+    return [file.resolve() for file in path.rglob("**/*.md") if file.is_file()]
 
 
 def MergePN(str1, str2):
@@ -15,6 +18,3 @@ def MergePN(str1, str2):
 
     result = ", ".join(merged)
     return result
-
-
-# print(result)

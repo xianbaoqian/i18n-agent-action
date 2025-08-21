@@ -2,10 +2,10 @@ import hashlib
 import logging
 import time
 
-import yaml
-from deepseek_tokenizer import tokenizer
-from metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 from openai import OpenAI
+
+from .deepseek_tokenizer import tokenizer
+from .metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 
 
 class clientInfo:
@@ -38,8 +38,6 @@ class clientInfo:
             self._usecache = bool(usecache)
         else:
             self._usecache = bool(usecache)
-        with open("config.yaml", "r", encoding="utf-8") as f:
-            self._config = yaml.safe_load(f)
         # 鲁棒性处理dryRun参数
         if isinstance(dryRun, str):
             self._dryRun = dryRun.lower() == "true"
@@ -77,9 +75,6 @@ class clientInfo:
             + self._model
         )
 
-    def get_config(self):
-        return self._config
-
     # 可选：添加一个显示所有配置的方法
     def show_config(self):
         """显示当前配置"""
@@ -92,11 +87,9 @@ class clientInfo:
     def talk(self, messages, use_json=False):
         if self._usecache:
             logging.info(f"Checking cache for Messages: {messages}")
-            # todo
             key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
             if key in self._local_cache:
                 return self._local_cache.get(key)
-        # return
 
         logging.info(f"Request to LLM - Messages: {messages}")
         if not self._dryRun:
@@ -119,7 +112,6 @@ class clientInfo:
             LLM_RESPONSE_TIME.observe(duration)
             # Add into cache
             if self._usecache:
-                # todo
                 key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
                 self._local_cache[key] = response
             # Handle token usage metrics
@@ -168,9 +160,3 @@ class clientInfo:
                 tokenizer(str(messages))
             )
             return None
-
-    def talk_to_LLM(self, messages):
-        return self.talk(messages, False)
-
-    def talk_to_LLM_Json(self, messages):
-        return self.talk(messages, True)

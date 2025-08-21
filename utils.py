@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 
 def validate_inputs(args):
@@ -45,8 +44,3 @@ def validate_inputs(args):
     #    raise ValueError("保留字不能为空")
 
     return configfile_path, doc_folder, reserved_word
-
-
-def get_all_files(directory):
-    path = Path(directory)
-    return [file.resolve() for file in path.rglob("**/*.md") if file.is_file()]
