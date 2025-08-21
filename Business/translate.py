@@ -3,14 +3,13 @@ import logging
 import os
 import threading
 
-from metric import (
+from .metric import (
     FILES_TRANSLATED,
     SOURCE_FILE_MISSING,
     TARGET_FILE_EXISTS,
     TRANSLATION_REQUESTS,
 )
-from proper_nouns_handle import MergePN
-
+from .utils import MergePN
 
 #
 # if should_refresh("data.txt", force_refresh=True):

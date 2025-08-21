@@ -2,12 +2,12 @@ import logging
 import os
 import sys
 
-from clientInfo import clientInfo
-from ExpiringDictStorage import ExpiringDictStorage
-from filesscopes import filesscopes
-from metric import print_metrics
-from translate import translate
-from translateConfig import TranslationContext
+from AgentUtils.clientInfo import clientInfo
+from AgentUtils.ExpiringDictStorage import ExpiringDictStorage
+from AgentUtils.metric import print_metrics
+from Business.filesscopes import filesscopes
+from Business.translate import translate
+from Business.translateConfig import TranslationContext
 from utils import validate_inputs
 
 logging.basicConfig(

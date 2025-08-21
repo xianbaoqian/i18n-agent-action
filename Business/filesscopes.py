@@ -1,7 +1,7 @@
 import json
 import logging
 
-from utils import get_all_files
+from .utils import get_all_files
 
 
 ### Phase 1 missingfiles

@@ -3,8 +3,8 @@ import logging
 import time
 
 import yaml
-from deepseek_tokenizer import tokenizer
-from metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
+from .deepseek_tokenizer import tokenizer
+from .metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 from openai import OpenAI
 
 
