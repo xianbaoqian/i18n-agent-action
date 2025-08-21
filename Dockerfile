@@ -2,7 +2,6 @@ FROM python:3.13
 WORKDIR /app
 
 # 从builder阶段复制已安装的包
-COPY --from=builder /root/.local /root/.local
 COPY . .
 RUN pip install --no-cache-dir .
 
