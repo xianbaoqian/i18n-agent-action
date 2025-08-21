@@ -3,7 +3,7 @@ FROM python:3.13 as builder
 
 WORKDIR /app
 COPY pyproject.toml ./
-RUN pip install --user --no-cache-dir .
+RUN pip install --no-cache-dir .
 
 # 第二阶段：生产环境
 FROM python:3.13.7-slim
