@@ -15,8 +15,8 @@ from .utils import MergePN
 
 
 class translateAgent(Agent):
-    def __init__(self, LLM_Client):
-        super().__init__(LLM_Client)
+    def __init__(self, LLM_Client, span_mgr):
+        super().__init__(LLM_Client, span_mgr)
 
     def should_refresh(self, target_file: str, force_refresh: bool = False) -> bool:
         """判断是否需要刷新文件"""
@@ -24,7 +24,7 @@ class translateAgent(Agent):
 
     # 定义处理函数
     #### todo if there is a existing file, then skip
-    def translate_element(self, TranslationContext, element):
+    def translate_element(self, TranslationContext, element, span):
         TRANSLATION_REQUESTS.labels(
             reserved_word=TranslationContext.reserved_word,
             target_language=element["target_language"],
@@ -115,7 +115,7 @@ class translateAgent(Agent):
                 },
             ]
             try:
-                response = self.talk_to_LLM_Json(messages)
+                response = self.talk_to_LLM_Json(messages, span)
                 translated_chunks.append(
                     json.loads(response.choices[0].message.content)["content"]
                 )
@@ -158,11 +158,7 @@ class translateAgent(Agent):
         ).inc()
 
     ### Phase 2
-    def translate(
-        self,
-        json_todo_list,
-        TranslationContext,
-    ):
+    def translate(self, json_todo_list, TranslationContext, span):
         total = len(json_todo_list["todo"])
         if self.dryRun():
             logging.info("dry Run model skip")
@@ -179,7 +175,7 @@ class translateAgent(Agent):
             nonlocal completed
             try:
                 logging.info("processing...one file")
-                self.translate_element(TranslationContext, item)
+                self.translate_element(TranslationContext, item, span)
             finally:
                 with counter_lock:
                     completed += 1

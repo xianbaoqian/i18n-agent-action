@@ -7,11 +7,11 @@ from .utils import get_all_files
 
 
 class filescopeAgent(Agent):
-    def __init__(self, LLM_Client):
-        super().__init__(LLM_Client)
+    def __init__(self, LLM_Client, span_mgr):
+        super().__init__(LLM_Client, span_mgr)
 
     ### Phase 1 missingfiles
-    def filesscopes(self, TranslationContext):
+    def filesscopes(self, TranslationContext, span):
         with open(TranslationContext.configfile_path, "r", encoding="utf-8") as file:
             config_file_content = file.read()  # 读取全部内容为字符串
         messages = [
@@ -38,7 +38,7 @@ class filescopeAgent(Agent):
                     }
                 ]
             }
-        response1 = self.talk_to_LLM(messages)
+        response1 = self.talk_to_LLM(messages, span)
         answer1 = response1.choices[0].message.content
         logging.info("问题1 回答:" + answer1)
         messages.append({"role": "user", "content": answer1})
@@ -68,7 +68,7 @@ class filescopeAgent(Agent):
                     ),
                 }
             )
-            response2 = self.talk_to_LLM_Json(messages)
+            response2 = self.talk_to_LLM_Json(messages, span)
             logging.info(
                 f"问题2 回答(批次 {i//batch_size + 1}):"
                 + response2.choices[0].message.content

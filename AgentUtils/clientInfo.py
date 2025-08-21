@@ -87,11 +87,9 @@ class clientInfo:
     def talk(self, messages, use_json=False):
         if self._usecache:
             logging.info(f"Checking cache for Messages: {messages}")
-            # todo
             key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
             if key in self._local_cache:
                 return self._local_cache.get(key)
-        # return
 
         logging.info(f"Request to LLM - Messages: {messages}")
         if not self._dryRun:
@@ -114,7 +112,6 @@ class clientInfo:
             LLM_RESPONSE_TIME.observe(duration)
             # Add into cache
             if self._usecache:
-                # todo
                 key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
                 self._local_cache[key] = response
             # Handle token usage metrics

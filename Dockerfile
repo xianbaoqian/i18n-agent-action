@@ -2,8 +2,11 @@
 FROM python:3.13 as builder
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --user -r requirements.txt
+COPY pyproject.toml ./
+RUN pip install --user --no-cache-dir poetry
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev --no-interaction --no-ansi
+
 
 # 第二阶段：生产环境
 FROM python:3.13.7-slim
