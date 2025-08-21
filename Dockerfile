@@ -1,17 +1,10 @@
-# 第一阶段：构建环境
-FROM python:3.13 as builder
-
-WORKDIR /app
-COPY pyproject.toml ./
-RUN pip install --no-cache-dir .
-
-# 第二阶段：生产环境
-FROM python:3.13.7-slim
+FROM python:3.13
 WORKDIR /app
 
 # 从builder阶段复制已安装的包
 COPY --from=builder /root/.local /root/.local
 COPY . .
+RUN pip install --no-cache-dir .
 
 # 确保脚本可访问
 ENV PATH=/root/.local/bin:$PATH
