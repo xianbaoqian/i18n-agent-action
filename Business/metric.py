@@ -1,7 +1,5 @@
-import logging
 
-from prometheus_client import REGISTRY, Counter, Summary
-from prometheus_client.exposition import generate_latest
+from prometheus_client import Counter
 
 # 定义指标
 SOURCE_FILE_MISSING = Counter(

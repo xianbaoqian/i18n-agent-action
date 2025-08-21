@@ -5,8 +5,8 @@ import sys
 from AgentUtils.clientInfo import clientInfo
 from AgentUtils.ExpiringDictStorage import ExpiringDictStorage
 from AgentUtils.metric import print_metrics
-from Business.filesscopes import filesscopes
-from Business.translate import translate
+from Business.filesscopes import filescopeAgent
+from Business.translate import translateAgent
 from Business.translateConfig import TranslationContext
 from utils import validate_inputs
 
@@ -55,9 +55,11 @@ context = TranslationContext(
 context.show_config()
 ## Workflow 1 missing files
 ### Phase 1
-json_todo_list = filesscopes(context, LLM_Client)
+FSAgent = filescopeAgent(LLM_Client)
+json_todo_list = FSAgent.filesscopes(context)
 ### Phase 2
-translate(json_todo_list, context, LLM_Client)
+TsAgent = translateAgent(LLM_Client)
+TsAgent.translate(json_todo_list, context)
 
 ### show metrics
 print_metrics()

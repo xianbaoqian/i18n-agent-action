@@ -1,5 +1,7 @@
 from typing import Optional
 
+import yaml
+
 
 class TranslationContext:
     def __init__(
@@ -46,6 +48,8 @@ class TranslationContext:
             self._max_files = int(max_files)
         except ValueError:
             self._max_files = 20
+        with open("config.yaml", "r", encoding="utf-8") as f:
+            self._config = yaml.safe_load(f)
 
     # ----------------------
     # 属性访问器 (使用 @property)
@@ -89,6 +93,10 @@ class TranslationContext:
     @property
     def disclaimers(self) -> bool:
         return self._disclaimers
+
+    @property
+    def config(self) -> bool:
+        return self._config
 
     def show_config(self) -> None:
         """

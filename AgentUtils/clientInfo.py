@@ -2,10 +2,10 @@ import hashlib
 import logging
 import time
 
-import yaml
+from openai import OpenAI
+
 from .deepseek_tokenizer import tokenizer
 from .metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
-from openai import OpenAI
 
 
 class clientInfo:
@@ -38,8 +38,6 @@ class clientInfo:
             self._usecache = bool(usecache)
         else:
             self._usecache = bool(usecache)
-        with open("config.yaml", "r", encoding="utf-8") as f:
-            self._config = yaml.safe_load(f)
         # 鲁棒性处理dryRun参数
         if isinstance(dryRun, str):
             self._dryRun = dryRun.lower() == "true"
@@ -76,9 +74,6 @@ class clientInfo:
             + " with model "
             + self._model
         )
-
-    def get_config(self):
-        return self._config
 
     # 可选：添加一个显示所有配置的方法
     def show_config(self):
@@ -168,9 +163,3 @@ class clientInfo:
                 tokenizer(str(messages))
             )
             return None
-
-    def talk_to_LLM(self, messages):
-        return self.talk(messages, False)
-
-    def talk_to_LLM_Json(self, messages):
-        return self.talk(messages, True)

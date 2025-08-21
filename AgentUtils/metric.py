@@ -10,6 +10,7 @@ LLM_TOKENS_USED = Counter(
     "llm_tokens_used_total", "Total tokens used by LLM", ["model", "type"]
 )
 
+
 def print_metrics():
     try:
         # 获取所有指标数据并解码为UTF-8字符串
