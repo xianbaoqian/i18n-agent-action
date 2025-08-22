@@ -18,6 +18,69 @@ class translateAgent(Agent):
     def __init__(self, LLM_Client, span_mgr):
         super().__init__(LLM_Client, span_mgr)
 
+    def translate(self, TranslationContext, target_language, content, span):
+        # Split content into chunks of 3000 characters
+        chunk_size = 3000
+        chunks = [
+            content[i : i + chunk_size] for i in range(0, len(content), chunk_size)
+        ]
+
+        translated_chunks = []
+        for i, chunk in enumerate(chunks):
+            logging.info(f"Processing chunk {i+1}/{len(chunks)} of {content}")
+            PN = TranslationContext.reserved_word
+            messages = [
+                {
+                    "role": "system",
+                    "content": TranslationContext.config["prompts"]["translator"],
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+        Please help translate the following content into {target_language}, reserved word: { PN } in English.
+        This is part {i+1} of {len(chunks)} of the document.
+
+        Example json output format:
+        {{
+            "content": "translated text here...",
+            "metadata": {{"chunk": {i+1}, "total": {len(chunks)}}},
+            "proper_nouns": "proper nouns 0, "proper nouns 1..."
+        }}
+
+        Content to translate:
+        {chunk}
+        """,
+                },
+            ]
+            try:
+                response = self.talk_to_LLM_Json(messages, span)
+                translated_chunks.append(
+                    json.loads(response.choices[0].message.content)["content"]
+                )
+                logging.info(
+                    json.loads((response.choices[0].message.content))["proper_nouns"]
+                )
+                # self evaluate for proper_nouns
+                PN = MergePN(
+                    PN,
+                    json.loads((response.choices[0].message.content))["proper_nouns"],
+                )
+            except Exception as e:
+                logging.info(f"Error translating chunk {i+1}: {str(e)}")
+                TRANSLATION_REQUESTS.labels(
+                    reserved_word=TranslationContext.reserved_word,
+                    target_language=target_language,
+                    status="error",
+                ).inc()
+                raise
+
+        # Combine all translated chunks
+        output_content = "\n".join(translated_chunks)
+        if TranslationContext.disclaimers:
+            output_content = output_content + "\n\n " + self.get_legal_info()
+
+        return output_content
+
     def should_refresh(self, target_file: str, force_refresh: bool = False) -> bool:
         """判断是否需要刷新文件"""
         return force_refresh or not os.path.isfile(target_file)
@@ -80,66 +143,9 @@ class translateAgent(Agent):
         with open(source_file, "r", encoding="utf-8") as file:
             file_content = file.read()
 
-        # Split content into chunks of 3000 characters
-        chunk_size = 3000
-        chunks = [
-            file_content[i : i + chunk_size]
-            for i in range(0, len(file_content), chunk_size)
-        ]
-
-        translated_chunks = []
-        for i, chunk in enumerate(chunks):
-            logging.info(f"Processing chunk {i+1}/{len(chunks)} of {source_file}")
-            PN = TranslationContext.reserved_word
-            messages = [
-                {
-                    "role": "system",
-                    "content": TranslationContext.config["prompts"]["translator"],
-                },
-                {
-                    "role": "user",
-                    "content": f"""
-        Please help translate the following content into {target_language}, reserved word: { PN } in English.
-        This is part {i+1} of {len(chunks)} of the document.
-
-        Example json output format:
-        {{
-            "content": "translated text here...",
-            "metadata": {{"chunk": {i+1}, "total": {len(chunks)}}},
-            "proper_nouns": "proper nouns 0, "proper nouns 1..."
-        }}
-
-        Content to translate:
-        {chunk}
-        """,
-                },
-            ]
-            try:
-                response = self.talk_to_LLM_Json(messages, span)
-                translated_chunks.append(
-                    json.loads(response.choices[0].message.content)["content"]
-                )
-                logging.info(
-                    json.loads((response.choices[0].message.content))["proper_nouns"]
-                )
-                # self evaluate for proper_nouns
-                PN = MergePN(
-                    PN,
-                    json.loads((response.choices[0].message.content))["proper_nouns"],
-                )
-            except Exception as e:
-                logging.info(f"Error translating chunk {i+1}: {str(e)}")
-                TRANSLATION_REQUESTS.labels(
-                    reserved_word=TranslationContext.reserved_word,
-                    target_language=target_language,
-                    status="error",
-                ).inc()
-                raise
-
-        # Combine all translated chunks
-        output_content = "\n".join(translated_chunks)
-        if TranslationContext.disclaimers:
-            output_content = output_content + "\n\n " + self.get_legal_info()
+        output_content = self.translate(
+            TranslationContext, target_language, file_content, span
+        )
 
         logging.info("translated " + target_file)
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
@@ -158,7 +164,7 @@ class translateAgent(Agent):
         ).inc()
 
     ### Phase 2
-    def translate(self, json_todo_list, TranslationContext, span):
+    def translate_files(self, json_todo_list, TranslationContext, span):
         total = len(json_todo_list["todo"])
         if self.dryRun():
             logging.info("dry Run model skip")

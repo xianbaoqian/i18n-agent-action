@@ -62,7 +62,7 @@ TsAgent = translateAgent(LLM_Client, span_mgr)
 ### Phase 1
 json_todo_list = FSAgent.filesscopes(context, root_span)
 ### Phase 2
-TsAgent.translate(json_todo_list, context, root_span)
+TsAgent.translate_files(json_todo_list, context, root_span)
 ### Finish the span
 span_mgr.end_span(root_span.hash)
 ### Display historical spans
