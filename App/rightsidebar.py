@@ -1,5 +1,6 @@
 import flet as ft
 
+
 class RightSidebar(ft.Container):
     def __init__(self, app):
         super().__init__()

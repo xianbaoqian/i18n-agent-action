@@ -1,10 +1,19 @@
+import os
 import random
+import sys
 from datetime import datetime, timedelta
-from rightsidebar import RightSidebar
-from leftsidebar import LeftSidebar
+
 import flet as ft
-from AgentUtils.span import Span_Mgr
-from Business.translate import translateAgent
+from leftsidebar import LeftSidebar
+from rightsidebar import RightSidebar
+
+# 添加项目根目录到Python路径
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_dir)
+
+from AgentUtils.span import Span_Mgr  # noqa: E402
+from Business.translate import translateAgent  # noqa: E402
+
 
 class TranslationApp:
     def __init__(self, page: ft.Page):
@@ -135,7 +144,9 @@ class TranslationApp:
         print(text)
         if text:
             # 尝试找到匹配的模拟翻译
-            result = TsAgent.translate(context,context.target_language,text, root_span)
+            result = TsAgent.translate(
+                context, context.target_language, text, root_span
+            )
             print(result)
             # 更新翻译结果
             self.main_content.controls[-1].content.value = result
@@ -196,8 +207,10 @@ class TranslationApp:
             )
         return labels
 
+
 def main(page: ft.Page):
     # app = TranslationApp(page)
     TranslationApp(page)
+
 
 ft.app(target=main)

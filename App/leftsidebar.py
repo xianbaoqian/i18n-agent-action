@@ -1,15 +1,8 @@
 import flet as ft
-
-import sys
-import os
-
-# 获取项目根目录路径（i18n-agent-action的上一级目录）
-root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(root_dir)
-
 from AgentUtils.clientInfo import clientInfo
 from AgentUtils.ExpiringDictStorage import ExpiringDictStorage
 from Business.translateConfig import TranslationContext
+
 
 class LeftSidebar(ft.Container):
     def __init__(self, app):
@@ -24,23 +17,23 @@ class LeftSidebar(ft.Container):
             can_reveal_password=True,
             value="",  # 默认值为空
         )
-        
+
         self.base_url_field = ft.TextField(
             value="https://api.deepseek.com",  # 默认值
         )
-        
+
         self.model_field = ft.TextField(
             value="deepseek-chat",  # 默认值
         )
-        
+
         self.target_language_field = ft.TextField(
             value="zh",  # 默认值
         )
-        
+
         self.reserved_word_field = ft.TextField(
             value="",  # 默认值为空
         )
-        
+
         self.auto_detect_switch = ft.Switch(label="自动检测语言", value=True)
         self.pronunciation_switch = ft.Switch(label="发音功能", value=False)
         self.save_history_switch = ft.Switch(label="保存翻译历史", value=True)
@@ -77,42 +70,35 @@ class LeftSidebar(ft.Container):
                 [
                     ft.Text("Settings", style=ft.TextThemeStyle.HEADLINE_SMALL),
                     ft.Divider(),
-                    
                     # API Key 输入框
                     ft.Text("API Key:"),
                     self.api_key_field,
-                    
                     # Base URL 输入框
                     ft.Text("Base URL:"),
                     self.base_url_field,
-                    
                     # Model 输入框
                     ft.Text("Model:"),
                     self.model_field,
-                    
                     # Target Language 输入框
                     ft.Text("Target Language:"),
                     self.target_language_field,
-                    
                     # Reserved Word 输入框
                     ft.Text("Reserved Word:"),
                     self.reserved_word_field,
-                    
                     # 保留的开关选项
                     self.auto_detect_switch,
                     self.pronunciation_switch,
                     self.save_history_switch,
-                    
                     # 保存按钮固定在底部
                     ft.Container(
                         content=ft.ElevatedButton(
-                            "保存设置", 
-                            icon=ft.Icons.SAVE, 
+                            "保存设置",
+                            icon=ft.Icons.SAVE,
                             on_click=self.save_settings,
-                            width=200
+                            width=200,
                         ),
                         alignment=ft.alignment.center,
-                        padding=ft.padding.only(top=20)
+                        padding=ft.padding.only(top=20),
                     ),
                 ],
                 spacing=15,
@@ -204,7 +190,7 @@ class LeftSidebar(ft.Container):
         print(f"发音功能: {self.pronunciation_switch.value}")
         print(f"保存翻译历史: {self.save_history_switch.value}")
         print("=================")
-        
+
         # 显示保存成功的提示
         if self.app.page:
             self.app.page.snack_bar = ft.SnackBar(ft.Text("设置已保存!"))
