@@ -26,3 +26,7 @@ Thumbs.db
 .vscode
 *.code-workspace
 backup
+
+data_store.json
+data_store.json.lock
+.coverage
