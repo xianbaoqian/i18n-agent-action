@@ -102,7 +102,7 @@ jobs:
       run: pip install poetry
 
     - name: Install dependencies
-      run: poetry install --with dev  # 安装主依赖和开发依赖（包括pytest）
+      run: poetry install --with dev --no-root # 安装主依赖和开发依赖（包括pytest）
 
     - name: Run tests
       run: poetry run pytest 
