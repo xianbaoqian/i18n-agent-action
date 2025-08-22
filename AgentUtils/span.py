@@ -43,6 +43,8 @@ class Span:
             bool: 是否成功结束Span
         """
         with self._lock:
+            if self.status == "closed":
+                return False
             # 检查所有子Span是否都已结束
             for child in self.children:
                 if child.status != "closed":

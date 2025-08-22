@@ -85,3 +85,24 @@ jobs:
           CONFIG_FILE: /workspace/mkdocs.yml
           workspace: /home/runner/work/i18n-agent-action/i18n-agent-action
           dryRun: True
+
+  test-python:
+    runs-on: ubuntu-latest  # 在最新 Ubuntu 系统上运行
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'  # 指定你的 Python 版本
+
+    - name: Install Poetry
+      run: pip install poetry
+
+    - name: Install dependencies
+      run: poetry install --with dev --no-root # 安装主依赖和开发依赖（包括pytest）
+
+    - name: Run tests
+      run: poetry run pytest 
