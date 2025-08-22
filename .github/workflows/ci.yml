@@ -96,7 +96,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'  # 指定你的 Python 版本
+        python-version: '3.12'  # 指定你的 Python 版本
 
     - name: Install Poetry
       run: pip install poetry
