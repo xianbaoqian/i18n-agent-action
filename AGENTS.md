@@ -24,8 +24,7 @@
 - Run tests for specific modules: `poetry run pytest`
 - To run with coverage: `poetry run pytest --cov=my_project -v`
 - Ensure all tests pass before committing changes
-- Lint ```
-docker run --rm \
+- Lint `docker run --rm \
   -e RUN_LOCAL=true \
   -e VALIDATE_PYTHON=true \
   -e VALIDATE_PYTHON_BLACK=true \
@@ -39,7 +38,7 @@ docker run --rm \
   -e FIX_PYTHON_BLACK=true \
   -v "$PWD:/tmp/lint" \
   ghcr.io/super-linter/super-linter:latest
-```
+`
 
 ## Documentation
 
