@@ -1,7 +1,14 @@
+import os
+import sys
+
 import flet as ft
-from AgentUtils.clientInfo import clientInfo
-from AgentUtils.ExpiringDictStorage import ExpiringDictStorage
-from Business.translateConfig import TranslationContext
+
+# 添加项目根目录到Python路径
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_dir)
+from AgentUtils.clientInfo import clientInfo  # noqa: E402
+from AgentUtils.ExpiringDictStorage import ExpiringDictStorage  # noqa: E402
+from Business.translateConfig import TranslationContext  # noqa: E402
 
 
 class LeftSidebar(ft.Container):
