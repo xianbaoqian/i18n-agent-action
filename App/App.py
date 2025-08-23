@@ -4,6 +4,7 @@ import sys
 from datetime import datetime, timedelta
 
 import flet as ft
+import pyttsx3
 from leftsidebar import LeftSidebar
 from rightsidebar import RightSidebar
 
@@ -142,6 +143,8 @@ class TranslationApp:
         TsAgent = translateAgent(LLM_client, span_mgr)
         text = self.text_input.value
         print(text)
+        engine = pyttsx3.init()
+
         if text:
             # 尝试找到匹配的模拟翻译
             result = TsAgent.translate(
@@ -151,6 +154,9 @@ class TranslationApp:
             # 更新翻译结果
             self.main_content.controls[-1].content.value = result
             self.page.update()
+            engine.say(result)
+            # play the speech
+            engine.runAndWait()
 
     def generate_usage_data(self):
         # 生成模拟的使用数据

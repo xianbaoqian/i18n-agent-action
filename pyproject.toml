@@ -28,7 +28,8 @@ Issues = "https://github.com/SamYuan1990/i18n-agent-action/issues"
 
 [project.optional-dependencies]
 app = [
-    "flet[all]>=0.28.3,<0.29.0"
+    "flet[all]>=0.28.3,<0.29.0",
+    "pyttsx3 >= 2.99"
 ]
 
 docs = [
@@ -42,6 +43,7 @@ docs = [
 
 [tool.poetry.group.app.dependencies]
 flet = {extras = ["all"], version = "^0.28.3"}
+pyttsx3 = "^2.99"
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = "^1.6.1"
