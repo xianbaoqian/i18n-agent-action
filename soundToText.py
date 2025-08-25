@@ -1,246 +1,234 @@
 #!/usr/bin/env python3
-#
-# Copyright (c)  2025  Xiaomi Corporation
-
-"""
-This file demonstrates how to use sherpa-onnx Python APIs
-with VAD and non-streaming SenseVoice for real-time speech recognition
-from a microphone.
-
-Usage:
-
-
-wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
-
-./python-api-examples/simulate-streaming-sense-voice-microphone.py  \
-  --silero-vad-model=./silero_vad.onnx \
-"""
-import argparse
+import os
 import queue
 import sys
 import threading
 import time
-from pathlib import Path
 
 import numpy as np
-
-try:
-    import sounddevice as sd
-except ImportError:
-    print("Please install sounddevice first. You can use")
-    print()
-    print("  pip install sounddevice")
-    print()
-    print("to install it")
-    sys.exit(-1)
-
+import pyttsx3
 import sherpa_onnx
+import sounddevice as sd
+from AgentUtils.clientInfo import clientInfo
+from AgentUtils.ExpiringDictStorage import ExpiringDictStorage
+from AgentUtils.span import Span_Mgr
+from Business.translate import translateAgent
+from Business.translateConfig import TranslationContext
 
-killed = False
-recording_thread = None
-sample_rate = 16000  # Please don't change it
-
-# buffer saves audio samples to be played
-samples_queue = queue.Queue()
-
-
-def get_args():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-
-    parser.add_argument(
-        "--silero-vad-model",
-        type=str,
-        required=True,
-        help="Path to silero_vad.onnx",
-    )
-
-    parser.add_argument(
-        "--tokens",
-        type=str,
-        help="Path to tokens.txt",
-    )
-
-    parser.add_argument(
-        "--sense-voice",
-        default="",
-        type=str,
-        help="Path to the model.onnx from SenseVoice",
-    )
-
-    parser.add_argument(
-        "--num-threads",
-        type=int,
-        default=2,
-        help="Number of threads for neural network computation",
-    )
-
-    parser.add_argument(
-        "--hr-dict-dir",
-        type=str,
-        default="",
-        help="If not empty, it is the jieba dict directory for homophone replacer",
-    )
-
-    parser.add_argument(
-        "--hr-lexicon",
-        type=str,
-        default="",
-        help="If not empty, it is the lexicon.txt for homophone replacer",
-    )
-
-    parser.add_argument(
-        "--hr-rule-fsts",
-        type=str,
-        default="",
-        help="If not empty, it is the replace.fst for homophone replacer",
-    )
-
-    return parser.parse_args()
+storage = ExpiringDictStorage(expiry_days=7)
+LLM_client = clientInfo(
+    api_key=os.getenv("api_key"),
+    base_url=os.getenv("base_url", "https://api.deepseek.com"),
+    model=os.getenv("model", "deepseek-chat"),
+    dryRun=os.getenv("dryRun", False),
+    local_cache=storage,
+    usecache=os.getenv("usecache", True),
+)
+context = TranslationContext(
+    target_language="zh",
+    file_list="",
+    configfile_path="",
+    doc_folder="",
+    reserved_word="",
+    max_files=20,
+    disclaimers=False,
+)
+span_mgr = Span_Mgr(storage)
+root_span = span_mgr.create_span("Root operation")
+TsAgent = translateAgent(LLM_client, span_mgr)
 
 
-def assert_file_exists(filename: str):
-    assert Path(filename).is_file(), (
-        f"{filename} does not exist!\n"
-        "Please refer to "
-        "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html to download it"
-    )
+class SpeechRecognizer:
+    def __init__(self, sample_rate=16000):
+        self.sample_rate = sample_rate
+        self.killed = False
+        self.samples_queue = queue.Queue()
+        self.recognizer = self._create_recognizer()
+        self.vad = self._create_vad()
+        self.display = Display()
+        self.recording_thread = None
+        self.pause_recording = threading.Event()  # 用于控制录音线程的暂停和恢复
+        self.engine = pyttsx3.init()
 
-
-def create_recognizer(args) -> sherpa_onnx.OfflineRecognizer:
-    encoder = "./base-encoder.onnx"
-    decoder = "./base-decoder.onnx"
-    tokens = "./base-tokens.txt"    
-    recognizer = sherpa_onnx.OfflineRecognizer.from_whisper(
-            encoder=encoder,
-            decoder=decoder,
-            tokens=tokens,
-            language=""
-            #debug=True,
+    def _create_recognizer(self):
+        """创建并返回语音识别器"""
+        return sherpa_onnx.OfflineRecognizer.from_whisper(
+            encoder="./base-encoder.onnx",
+            decoder="./base-decoder.onnx",
+            tokens="./base-tokens.txt",
+            language="",
         )
 
-    return recognizer
+    def _create_vad(self):
+        """创建并返回语音活动检测器"""
+        config = sherpa_onnx.VadModelConfig()
+        config.silero_vad.model = "./silero_vad.onnx"
+        config.silero_vad.threshold = 0.5
+        config.silero_vad.min_silence_duration = 0.1
+        config.silero_vad.min_speech_duration = 0.25
+        config.silero_vad.max_speech_duration = 8
+        config.sample_rate = self.sample_rate
 
+        return sherpa_onnx.VoiceActivityDetector(config, buffer_size_in_seconds=100)
 
-def start_recording():
-    # You can use any value you like for samples_per_read
-    samples_per_read = int(0.1 * sample_rate)  # 0.1 second = 100 ms
+    def start_recording(self):
+        """录音线程函数"""
+        samples_per_read = int(0.1 * self.sample_rate)  # 100 ms
 
-    with sd.InputStream(channels=1, dtype="float32", samplerate=sample_rate) as s:
-        while not killed:
-            samples, _ = s.read(samples_per_read)  # a blocking read
-            samples = samples.reshape(-1)
-            samples = np.copy(samples)
-            samples_queue.put(samples)
+        with sd.InputStream(
+            channels=1, dtype="float32", samplerate=self.sample_rate
+        ) as stream:
+            while not self.killed:
+                # 检查是否需要暂停
+                if self.pause_recording.is_set():
+                    time.sleep(0.01)  # 短暂休眠以减少CPU使用
+                    continue
+                samples, _ = stream.read(samples_per_read)
+                self.samples_queue.put(samples.reshape(-1).copy())
 
+    def process_audio(self, buffer, offset, started, started_time):
+        """处理音频数据并返回更新后的状态"""
+        window_size = self.vad.config.silero_vad.window_size
 
-def main():
-    devices = sd.query_devices()
-    if len(devices) == 0:
-        print("No microphone devices found")
-        sys.exit(0)
-
-    print(devices)
-
-    # If you want to select a different input device, please use
-    # sd.default.device[0] = xxx
-    # where xxx is the device number
-
-    default_input_device_idx = sd.default.device[0]
-    print(f'Use default device: {devices[default_input_device_idx]["name"]}')
-
-    args = get_args()
-    #assert_file_exists(args.tokens)
-    assert_file_exists(args.silero_vad_model)
-
-    assert args.num_threads > 0, args.num_threads
-
-    print("Creating recognizer. Please wait...")
-    recognizer = create_recognizer(args)
-
-    config = sherpa_onnx.VadModelConfig()
-    config.silero_vad.model = args.silero_vad_model
-    config.silero_vad.threshold = 0.5
-    config.silero_vad.min_silence_duration = 0.1  # seconds
-    config.silero_vad.min_speech_duration = 0.25  # seconds
-    # If the current segment is larger than this value, then it increases
-    # the threshold to 0.9 internally. After detecting this segment,
-    # it resets the threshold to its original value.
-    config.silero_vad.max_speech_duration = 8  # seconds
-    config.sample_rate = sample_rate
-
-    window_size = config.silero_vad.window_size
-
-    vad = sherpa_onnx.VoiceActivityDetector(config, buffer_size_in_seconds=100)
-
-    print("Started! Please speak")
-
-    buffer = []
-
-    global recording_thread
-    recording_thread = threading.Thread(target=start_recording)
-    recording_thread.start()
-
-    display = sherpa_onnx.Display()
-
-    started = False
-    started_time = None
-
-    offset = 0
-    while not killed:
-        samples = samples_queue.get()  # a blocking read
-
-        buffer = np.concatenate([buffer, samples])
+        # 更新VAD状态
         while offset + window_size < len(buffer):
-            vad.accept_waveform(buffer[offset : offset + window_size])
-            if not started and vad.is_speech_detected():
+            self.vad.accept_waveform(buffer[offset : offset + window_size])
+            if not started and self.vad.is_speech_detected():
                 started = True
                 started_time = time.time()
             offset += window_size
 
-        if not started:
-            if len(buffer) > 10 * window_size:
-                offset -= len(buffer) - 10 * window_size
-                buffer = buffer[-10 * window_size :]
+        # 处理缓冲区溢出
+        if not started and len(buffer) > 10 * window_size:
+            offset -= len(buffer) - 10 * window_size
+            buffer = buffer[-10 * window_size :]
 
+        # 处理检测到的语音
         if started and time.time() - started_time > 0.2:
-            stream = recognizer.create_stream()
-            stream.accept_waveform(sample_rate, buffer)
-            recognizer.decode_stream(stream)
+            stream = self.recognizer.create_stream()
+            stream.accept_waveform(self.sample_rate, buffer)
+            self.recognizer.decode_stream(stream)
+
             text = stream.result.text.strip()
             if text:
-                display.update_text(text)
-                display.display()
+                self.display.update_text(text)
+                started_time = time.time()
 
-            started_time = time.time()
+        # 处理VAD结果
+        while not self.vad.empty():
+            # 暂停录音线程
+            self.pause_recording.set()
 
-        while not vad.empty():
-            # In general, this while loop is executed only once
-            stream = recognizer.create_stream()
-            stream.accept_waveform(sample_rate, vad.front.samples)
+            try:
+                stream = self.recognizer.create_stream()
+                stream.accept_waveform(self.sample_rate, self.vad.front.samples)
+                self.vad.pop()
+                self.recognizer.decode_stream(stream)
 
-            vad.pop()
-            recognizer.decode_stream(stream)
+                text = stream.result.text.strip()
+                self.display.update_text(text)
+                result = self.display.finalize_current_sentence()
+                if result is not None:
+                    print("Result:", result)
+                    afterTs = TsAgent.translate(
+                        context, context.target_language, result, root_span
+                    )
+                    self.engine.say(afterTs)
+                    self.engine.runAndWait()
+                    time.sleep(10)
+            finally:
+                # 确保无论发生什么都会恢复录音线程
+                self.pause_recording.clear()
 
-            text = stream.result.text.strip()
+            # 重置状态
+            buffer, offset, started, started_time = [], 0, False, None
 
-            display.update_text(text)
+        return buffer, offset, started, started_time
 
-            buffer = []
-            offset = 0
-            started = False
-            started_time = None
+    def run(self):
+        """运行语音识别主循环"""
+        print("Started! Please speak")
 
-            display.finalize_current_sentence()
-            display.display()
+        # 启动录音线程
+        self.recording_thread = threading.Thread(target=self.start_recording)
+        self.recording_thread.start()
+
+        # 初始化状态
+        buffer, offset, started, started_time = [], 0, False, None
+
+        # 主处理循环
+        while not self.killed:
+            try:
+                samples = self.samples_queue.get(timeout=0.1)
+                buffer = np.concatenate([buffer, samples])
+                buffer, offset, started, started_time = self.process_audio(
+                    buffer, offset, started, started_time
+                )
+            except queue.Empty:
+                continue
+
+    def stop(self):
+        """停止语音识别"""
+        self.killed = True
+        if self.recording_thread:
+            self.recording_thread.join()
+
+
+class Display:
+    """简单的文本显示管理类"""
+
+    def __init__(self):
+        self.current_text = ""
+
+    def update_text(self, text):
+        self.current_text = text
+
+    def finalize_current_sentence(self):
+        text = self.current_text.strip()
+        self.current_text = ""
+        return text if text else None
+
+
+def check_audio_devices():
+    """检查可用的音频设备"""
+    devices = sd.query_devices()
+    if not devices:
+        print("No microphone devices found")
+        sys.exit(1)
+
+    default_input_device_idx = sd.default.device[0]
+    print(f'Using default device: {devices[default_input_device_idx]["name"]}')
+    return devices
+
+
+def monitor_pause_status(recognizer):
+    """每秒检测一次pause_recording状态的函数"""
+    while not recognizer.killed:
+        status = "paused" if recognizer.pause_recording.is_set() else "recording"
+        print(f"Recording status: {status}")
+        time.sleep(1)
+
+
+def main():
+    """主函数"""
+    check_audio_devices()
+
+    print("Creating recognizer. Please wait...")
+    recognizer = SpeechRecognizer()
+
+    # 启动状态监控线程
+    monitor_thread = threading.Thread(
+        target=monitor_pause_status, args=(recognizer,), daemon=True
+    )
+    monitor_thread.start()
+
+    try:
+        recognizer.run()
+    except KeyboardInterrupt:
+        print("\nCaught Ctrl + C. Exiting")
+    finally:
+        recognizer.stop()
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        killed = True
-        if recording_thread:
-            recording_thread.join()
-        print("\nCaught Ctrl + C. Exiting")
+    main()
