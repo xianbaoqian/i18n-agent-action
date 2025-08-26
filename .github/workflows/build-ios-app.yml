@@ -20,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |
@@ -33,10 +33,12 @@ jobs:
 
     - name: Build iOS app with Flet
       run: |
-        flet build ipa
+        cp -r AgentUtils App/AgentUtils
+        cp -r Business App/Business
+        cp pyproject.toml ./App
+        flet build ipa ./App --output=build/macos -v
         
     - name: Upload iOS app artifact (on push only)
-      if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: iOS-Flet-App
