@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import logging
 import os
 import queue
 import sys
@@ -25,7 +26,7 @@ LLM_client = clientInfo(
     usecache=os.getenv("usecache", True),
 )
 context = TranslationContext(
-    target_language="zh",
+    target_language="en",
     file_list="",
     configfile_path="",
     doc_folder="",
@@ -36,6 +37,10 @@ context = TranslationContext(
 span_mgr = Span_Mgr(storage)
 root_span = span_mgr.create_span("Root operation")
 TsAgent = translateAgent(LLM_client, span_mgr)
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
+)
 
 
 class SpeechRecognizer:
