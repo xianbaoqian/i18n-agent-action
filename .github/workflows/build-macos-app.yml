@@ -8,14 +8,14 @@ on:
 
 jobs:
   build-macos-app:
-    runs-on: macos-15  # 使用最新的 macOS 运行器
+    runs-on: macos-13  # 使用最新的 macOS 运行器
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install Rosetta 2
-      run: sudo softwareupdate --install-rosetta --agree-to-license
+    #- name: Install Rosetta 2
+    #  run: sudo softwareupdate --install-rosetta --agree-to-license
 
     - name: Set up Python
       uses: actions/setup-python@v5
