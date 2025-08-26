@@ -14,8 +14,8 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install Rosetta 2
-      run: sudo softwareupdate --install-rosetta --agree-to-license
+    #- name: Install Rosetta 2
+    #  run: sudo softwareupdate --install-rosetta --agree-to-license
 
     - name: Set up Python
       uses: actions/setup-python@v5
