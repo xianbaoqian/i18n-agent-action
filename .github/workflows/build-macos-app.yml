@@ -33,7 +33,7 @@ jobs:
 
     - name: Build macOS app with Flet
       run: |
-        flet build macos ./App --output=./
+        flet build macos ./App --output=./build
 
     - name: Upload macOS app artifact (on push only)
       if: github.event_name == 'push'
