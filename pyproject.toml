@@ -15,7 +15,6 @@ authors = [
 ]
 dependencies = [
     "openai (>=1.100.2,<2.0.0)",
-    "transformers (>=4.55.2,<5.0.0)",
     "prometheus-client (>=0.22.1,<0.23.0)",
     "python-defer (>=0.2.1,<0.3.0)"
 ]
