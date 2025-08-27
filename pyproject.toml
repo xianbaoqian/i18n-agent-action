@@ -65,4 +65,4 @@ pytest = "^8.4.1"
 pytest-cov = "^6.2.1"
 
 [tool.flit.sdist]
-include = ["../AgentUtils/**/*","../Business/**/*"]
+include = ["AgentUtils/**/*","Business/**/*"]
