@@ -33,10 +33,12 @@ jobs:
 
     - name: Build macOS app with Flet
       run: |
+        cp -r AgentUtils App/AgentUtils
+        cp -r Business App/Business
+        cp pyproject.toml ./App
         flet build macos ./App --output=build/macos -v
 
     - name: Upload macOS app artifact (on push only)
-      if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: macOS-Flet-App
