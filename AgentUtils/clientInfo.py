@@ -108,7 +108,7 @@ class clientInfo:
             # Make the API call
             response = self._client.chat.completions.create(**request_params)
             duration = time.time() - start_time
-            LLM_RESPONSE_TIME.observe(duration)
+            LLM_RESPONSE_TIME.inc(duration)
             # Add into cache
             if self._usecache:
                 key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
