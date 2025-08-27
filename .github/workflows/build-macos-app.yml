@@ -36,7 +36,6 @@ jobs:
         flet build macos ./App --output=build/macos -v
 
     - name: Upload macOS app artifact (on push only)
-      if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: macOS-Flet-App
