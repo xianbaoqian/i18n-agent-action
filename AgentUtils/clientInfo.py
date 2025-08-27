@@ -44,10 +44,10 @@ class clientInfo:
             self._dryRun = bool(dryRun)
         else:
             self._dryRun = bool(dryRun)
-        if not self._dryRun:
-            self._client = OpenAI(api_key=self._api_key, base_url=self._base_url)
-        else:
-            self._client = None
+        # if not self._dryRun:
+        #    self._client = OpenAI(api_key=self._api_key, base_url=self._base_url)
+        # else:
+        self._client = None
 
     # Getter方法
     def get_api_key(self):
@@ -84,6 +84,8 @@ class clientInfo:
         logging.info(f"  Cache: {self._usecache}")
 
     def talk(self, messages, use_json=False):
+        if not self._dryRun and self._client is None:
+            self._client = OpenAI(api_key=self._api_key, base_url=self._base_url)
         if self._usecache:
             logging.info(f"Checking cache for Messages: {messages}")
             key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
