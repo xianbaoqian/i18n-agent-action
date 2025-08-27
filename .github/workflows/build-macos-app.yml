@@ -33,6 +33,8 @@ jobs:
 
     - name: Build macOS app with Flet
       run: |
+        cp -r AgentUtils App/AgentUtils
+        cp -r Business App/Business
         flet build macos ./App --output=build/macos -v
 
     - name: Upload macOS app artifact (on push only)
