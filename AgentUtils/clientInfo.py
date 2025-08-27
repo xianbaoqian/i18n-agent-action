@@ -4,7 +4,6 @@ import time
 
 from openai import OpenAI
 
-from .deepseek_tokenizer import tokenizer
 from .metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
 
 
@@ -122,9 +121,6 @@ class clientInfo:
                 prompt_cache_miss_tokens = response.usage.prompt_cache_miss_tokens
                 completion_tokens = response.usage.completion_tokens
                 total_tokens = response.usage.total_tokens
-                LLM_TOKENS_USED.labels(model=self._model, type="char_count").inc(
-                    tokenizer(str(messages))
-                )
                 LLM_TOKENS_USED.labels(model=self._model, type="prompt_cache_hit").inc(
                     prompt_cache_hit_tokens
                 )
@@ -157,6 +153,6 @@ class clientInfo:
             return response
         else:
             LLM_TOKENS_USED.labels(model=self._model, type="char_count").inc(
-                tokenizer(str(messages))
+                len(str(messages))
             )
             return None
