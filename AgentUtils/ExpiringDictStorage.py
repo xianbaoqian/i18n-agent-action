@@ -3,21 +3,18 @@ import os
 import threading
 import time
 
-from filelock import FileLock
 from openai.types.chat import ChatCompletion
-
 
 class ExpiringDictStorage:
     def __init__(self, filename="data_store.json", expiry_days=7):
         self.filename = filename
         self.expiry_days = expiry_days
         self.lock = threading.Lock()
-        self.file_lock = FileLock(filename + ".lock")
         self.data = self._load_data()
 
     def _load_data(self):
         """加载数据并清理过期项"""
-        with self.file_lock:
+        with self.lock:
             if not os.path.exists(self.filename):
                 return {"_metadata": {"last_clean": time.time()}, "data": {}}
 
