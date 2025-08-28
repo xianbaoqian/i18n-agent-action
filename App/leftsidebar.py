@@ -296,7 +296,7 @@ class LeftSidebar(ft.Container):
             model=self.model_field.value,
             dryRun=False,
             local_cache=self.storage,
-            usecache=self.save_history_switch.value,
+            usecache=True,
         )
         print(f"自动检测语言: {self.auto_detect_switch.value}")
         print(f"发音功能: {self.pronunciation_switch.value}")
