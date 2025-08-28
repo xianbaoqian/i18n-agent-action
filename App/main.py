@@ -12,8 +12,12 @@ from rightsidebar import RightSidebar
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(root_dir)
 
+import logging
+
 from AgentUtils.span import Span_Mgr  # noqa: E402
 from Business.translate import translateAgent  # noqa: E402
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class TranslationApp:
