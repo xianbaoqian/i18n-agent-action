@@ -15,6 +15,9 @@ env:
   # Python version to use
   PYTHON_VERSION: 3.12.8
 
+  # flet-cli version to install for `flet build`
+  FLET_CLI_VERSION: 0.27.5
+
   # Ensures Python uses UTF-8 encoding by default
   PYTHONUTF8: 1
 
@@ -40,7 +43,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flet-cli
+        pip install flet-cli==$FLET_CLI_VERSION
 
     - name: Build iOS app with Flet
       run: |
