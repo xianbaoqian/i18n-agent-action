@@ -1,9 +1,13 @@
+import os
 import random
+import sys
 from datetime import datetime, timedelta
+
 import flet as ft
 import pyttsx3
-import os
-import sys
+from leftsidebar import LeftSidebar
+from rightsidebar import RightSidebar
+
 # 添加项目根目录到Python路径
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(root_dir)
@@ -11,8 +15,6 @@ sys.path.append(root_dir)
 from AgentUtils.span import Span_Mgr  # noqa: E402
 from Business.translate import translateAgent  # noqa: E402
 
-from leftsidebar import LeftSidebar
-from rightsidebar import RightSidebar
 
 class TranslationApp:
     def __init__(self, page: ft.Page):
@@ -20,7 +22,7 @@ class TranslationApp:
         self.page.title = "i18n agent"
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.setup_ui()
-
+        self.log_contents = []
         # 模拟统计数据
         self.translation_count = 42
         self.favorite_translations = 7
@@ -59,6 +61,11 @@ class TranslationApp:
             on_click=self.toggle_right_sidebar,
         )
 
+        # 创建日志查看按钮（放在右侧边栏按钮的右边）
+        self.log_view_toggle = ft.IconButton(
+            icon=ft.Icons.LIST_ALT, tooltip="查看日志", on_click=self.show_logs
+        )
+
         # 创建左侧边栏
         self.left_sidebar = LeftSidebar(self)
 
@@ -71,8 +78,14 @@ class TranslationApp:
                 ft.Row(
                     [
                         ft.Text("i18n agent", style=ft.TextThemeStyle.HEADLINE_LARGE),
-                        self.left_sidebar_toggle,
-                        self.right_sidebar_toggle,
+                        ft.Row(
+                            [
+                                self.left_sidebar_toggle,
+                                self.right_sidebar_toggle,
+                                self.log_view_toggle,
+                            ],
+                            spacing=5,
+                        ),
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 ),
@@ -94,6 +107,17 @@ class TranslationApp:
             alignment=ft.MainAxisAlignment.START,
             expand=True,
         )
+
+        # 创建日志弹窗
+        self.log_dialog = ft.AlertDialog(
+            title=ft.Text("查看日志"),
+            content=ft.Text(""),
+            alignment=ft.alignment.center,
+            on_dismiss=lambda e: print("Dialog dismissed!"),
+            title_padding=ft.padding.all(25),
+        )
+
+        self.page.overlay.append(self.log_dialog)
 
         # 设置页面布局
         self.page.add(
@@ -130,6 +154,36 @@ class TranslationApp:
             else ft.Icons.ARROW_FORWARD
         )
         self.page.update()
+
+    def show_logs(self, e):
+        # 读取日志文件并显示最近30条
+        app_data_path = os.getenv("FLET_APP_STORAGE_DATA")
+        log_file_path = (
+            os.path.join(app_data_path, "app.log") if app_data_path else "app.log"
+        )
+
+        self.log_contents = []
+        if os.path.exists(log_file_path):
+            try:
+                with open(log_file_path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+                    # 获取最后30行
+                    recent_lines = lines[-10:] if len(lines) > 10 else lines
+                    self.log_contents = [
+                        ft.Text(line.strip(), size=5) for line in recent_lines
+                    ]
+            except Exception as e:
+                self.log_contents = [
+                    ft.Text(f"读取日志文件出错: {str(e)}", size=5, color=ft.Colors.RED)
+                ]
+        else:
+            self.log_contents = [
+                ft.Text("日志文件不存在", size=12, color=ft.Colors.RED)
+            ]
+
+        self.log_dialog.content.value = str(self.log_contents)
+        self.log_dialog.update()
+        self.page.open(self.log_dialog)
 
     def translate_text(self, e):
         # 模拟翻译功能

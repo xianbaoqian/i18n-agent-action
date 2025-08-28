@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 import flet as ft
 from TranslationApp import TranslationApp
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # 创建文件handler并设置级别
 app_data_path = os.getenv("FLET_APP_STORAGE_DATA")
