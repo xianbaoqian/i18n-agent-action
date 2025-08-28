@@ -207,6 +207,7 @@ class TranslationApp:
             # 更新翻译结果
             self.main_content.controls[-1].content.value = result
             self.page.update()
+            self.left_sidebar.AppendHistory(text, result)
             engine.say(result)
             # play the speech
             engine.runAndWait()

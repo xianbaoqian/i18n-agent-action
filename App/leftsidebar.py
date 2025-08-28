@@ -24,6 +24,9 @@ class LeftSidebar(ft.Container):
         self.storage = ExpiringDictStorage(
             filename=self.storage_file_path, expiry_days=7
         )
+        self.Trans_History = []
+        if "history" in self.storage:
+            self.Trans_History = self.storage.get("history")
 
         # 获取应用数据存储路径
         self.config_file_path = os.path.join(self.app_data_path, "app_config.json")
@@ -158,20 +161,16 @@ class LeftSidebar(ft.Container):
                 ft.ListView(
                     controls=[
                         ft.ListTile(
-                            title=ft.Text("你好"),
-                            subtitle=ft.Text("Hello"),
-                            trailing=ft.IconButton(icon=ft.Icons.DELETE_OUTLINE),
-                        ),
-                        ft.ListTile(
-                            title=ft.Text("谢谢"),
-                            subtitle=ft.Text("Thank you"),
-                            trailing=ft.IconButton(icon=ft.Icons.DELETE_OUTLINE),
-                        ),
-                        ft.ListTile(
-                            title=ft.Text("再见"),
-                            subtitle=ft.Text("Goodbye"),
-                            trailing=ft.IconButton(icon=ft.Icons.DELETE_OUTLINE),
-                        ),
+                            title=ft.Text(item["original"]),
+                            subtitle=ft.Text(item["translated"]),
+                            trailing=ft.IconButton(
+                                icon=ft.Icons.DELETE_OUTLINE,
+                                on_click=lambda e, idx=index: self.delete_history_item(
+                                    idx
+                                ),
+                            ),
+                        )
+                        for index, item in enumerate(self.Trans_History)
                     ],
                     expand=True,
                 ),
@@ -209,6 +208,31 @@ class LeftSidebar(ft.Container):
             bgcolor=ft.Colors.BLUE_GREY_50,
             expand=True,
         )
+
+    def AppendHistory(self, text, translate):
+        self.Trans_History.append({"original": text, "translated": translate})
+        self.storage["history"] = self.Trans_History
+        self.update_history_display()
+
+    def update_history_display(self):
+        # 清空现有控件
+        self.history_content.controls[2].controls.clear()
+
+        # 重新生成所有历史记录项
+        for index, item in enumerate(self.Trans_History):
+            self.history_content.controls[2].controls.append(
+                ft.ListTile(
+                    title=ft.Text(item["original"]),
+                    subtitle=ft.Text(item["translated"]),
+                    trailing=ft.IconButton(
+                        icon=ft.Icons.DELETE_OUTLINE,
+                        on_click=lambda e, idx=index: self.delete_history_item(idx),
+                    ),
+                )
+            )
+
+        # 刷新页面
+        self.page.update()
 
     def load_config(self):
         """从本地文件加载配置，如果文件不存在则返回空字典"""
