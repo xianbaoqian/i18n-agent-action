@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 
@@ -32,7 +33,9 @@ class LeftSidebar(ft.Container):
         if not self.secret_key:
             # 如果没有设置环境变量，使用默认密钥（生产环境中应使用更安全的方式）
             self.secret_key = "DEFAULT_SECRET_KEY_CHANGE_IN_PRODUCTION"
-            print("警告: 使用默认加密密钥，生产环境中应设置MY_APP_SECRET_KEY环境变量")
+            logging.info(
+                "警告: 使用默认加密密钥，生产环境中应设置MY_APP_SECRET_KEY环境变量"
+            )
 
         # 尝试加载保存的配置
         saved_config = self.load_config()
@@ -219,7 +222,9 @@ class LeftSidebar(ft.Container):
                         decrypted_data = decrypt(encrypted_data, self.secret_key)
                         config = json.loads(decrypted_data)
         except Exception as e:
-            print(f"加载配置时出错: {e}")
+            logging.info(f"加载配置时出错: {e}")
+
+        logging.info("load data from config file.")
         return config
 
     def save_config(self, config):
@@ -237,7 +242,7 @@ class LeftSidebar(ft.Container):
                 f.write(encrypted_data)
             return True
         except Exception as e:
-            print(f"保存配置时出错: {e}")
+            logging.info(f"保存配置时出错: {e}")
             return False
 
     def nav_change(self, e):
@@ -272,16 +277,15 @@ class LeftSidebar(ft.Container):
                 self.app.page.snack_bar.open = True
                 self.app.page.update()
 
-            print("=== 配置已保存 ===")
-            print(f"API Key: {self.api_key_field.value}")
-            print(f"Base URL: {self.base_url_field.value}")
-            print(f"Model: {self.model_field.value}")
-            print(f"Target Language: {self.target_language_field.value}")
-            print(f"Reserved Word: {self.reserved_word_field.value}")
-            print(f"自动检测语言: {self.auto_detect_switch.value}")
-            print(f"发音功能: {self.pronunciation_switch.value}")
-            print(f"保存翻译历史: {self.save_history_switch.value}")
-            print("=================")
+            logging.info("=== 配置已保存 ===")
+            logging.info(f"Base URL: {self.base_url_field.value}")
+            logging.info(f"Model: {self.model_field.value}")
+            logging.info(f"Target Language: {self.target_language_field.value}")
+            logging.info(f"Reserved Word: {self.reserved_word_field.value}")
+            logging.info(f"自动检测语言: {self.auto_detect_switch.value}")
+            logging.info(f"发音功能: {self.pronunciation_switch.value}")
+            logging.info(f"保存翻译历史: {self.save_history_switch.value}")
+            logging.info("=================")
         else:
             # 显示保存失败的提示
             if self.app.page:
@@ -298,9 +302,9 @@ class LeftSidebar(ft.Container):
             local_cache=self.storage,
             usecache=True,
         )
-        print(f"自动检测语言: {self.auto_detect_switch.value}")
-        print(f"发音功能: {self.pronunciation_switch.value}")
-        print("=================")
+        logging.info(f"自动检测语言: {self.auto_detect_switch.value}")
+        logging.info(f"发音功能: {self.pronunciation_switch.value}")
+        logging.info("=================")
         return LLM_Client
 
     def get_storage(self):

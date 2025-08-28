@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import sys
@@ -113,7 +114,7 @@ class TranslationApp:
             title=ft.Text("查看日志"),
             content=ft.Text(""),
             alignment=ft.alignment.center,
-            on_dismiss=lambda e: print("Dialog dismissed!"),
+            on_dismiss=lambda e: logging.info("Dialog dismissed!"),
             title_padding=ft.padding.all(25),
         )
 
@@ -194,7 +195,7 @@ class TranslationApp:
         root_span = span_mgr.create_span("Root operation")
         TsAgent = translateAgent(LLM_client, span_mgr)
         text = self.text_input.value
-        print(text)
+        logging.info(text)
         engine = pyttsx3.init()
 
         if text:
@@ -202,7 +203,7 @@ class TranslationApp:
             result = TsAgent.translate(
                 context, context.target_language, text, root_span
             )
-            print(result)
+            logging.info(result)
             # 更新翻译结果
             self.main_content.controls[-1].content.value = result
             self.page.update()
