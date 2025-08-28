@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 import yaml
@@ -29,7 +30,8 @@ class TranslationContext:
         self._configfile_path = configfile_path
         self._doc_folder = doc_folder
         self._reserved_word = reserved_word
-        """将各种类型的值转换为布尔值"""
+
+        # 处理disclaimers参数
         if isinstance(disclaimers, bool):
             self._disclaimers = disclaimers
         elif isinstance(disclaimers, str):
@@ -44,12 +46,40 @@ class TranslationContext:
             self._disclaimers = bool(disclaimers)
         else:
             self._disclaimers = True
+
+        # 处理max_files参数
         try:
             self._max_files = int(max_files)
-        except ValueError:
+        except (ValueError, TypeError):
             self._max_files = 20
-        with open("config.yaml", "r", encoding="utf-8") as f:
-            self._config = yaml.safe_load(f)
+
+        # 加载配置文件，如果不存在则使用默认配置
+        self._config = self._load_config()
+
+    def _load_config(self):
+        """加载配置文件，如果不存在则使用默认配置"""
+        # 默认配置
+        default_config = {
+            "prompts": {
+                "config_analysis": "According to config file below:\n- Which i18n does the project cover?\n- What's the naming rule or file path rule for i18n mapping between different language editions?",
+                "json_schema": 'Please result in mapping as default language file, target file.\nThe empty json schema is:\n{\n  "todo": []\n}\nIf there\'s one object in json:\n{\n  "todo": [\n    {\n      "source_file": "/path_to_default_language_file",\n      "target_file": "/path_to_target_file",\n      "target_language": "zh"\n    }\n  ]\n}',
+                "translator": "Your expertise encompasses software engineering, system administration, data science, and emerging technologies.\n\nYour core responsibilities:\n- Translate technical content while preserving exact meaning, context, and nuance\n- Maintain all original formatting, markdown syntax, html syntax, code blocks, and structural elements\n- Preserve technical terminology, API names, command syntax, and code snippets unchanged\n- Adapt explanations and descriptions to target language conventions while keeping technical accuracy\n- Handle specialized domains including cloud computing, DevOps, machine learning, cybersecurity, and enterprise software\n\nTranslation methodology:\n- Ensure you apply the conventions and the formatting rules for markdown files\n- Analyze the source content to identify technical terms, code elements, and formatting structure\n- Research domain-specific terminology in the target language when needed, list any proper nouns as result.\n- Translate descriptive text while preserving technical precision\n- Maintain consistency in terminology throughout the document\n- Preserve all code blocks, command examples, URLs, and technical identifiers exactly as written\n- Adapt cultural references and examples when necessary for target audience comprehension\n\nQuality assurance steps:\n- Don't add any additional instructions or markings\n- Don't include any information about document chunking (e.g. \"This is Part X\")\n- Strictly preserve the formatting and structure of the original document\n- Verify that all technical terms are accurately translated or appropriately kept in original language\n- Ensure code syntax, commands, and technical examples remain functional\n- Check that formatting and document structure are preserved\n- Confirm that the translated content maintains the same level of technical detail and accuracy\n- Please keep any proper nouns you found.\n- When encountering ambiguous technical terms or proper nouns, provide brief explanations in parentheses (please reference provided reserved word from user)",
+                "analysis": "You are a senior software engineer\n\nYour core responsibilities:\n- Analysis user's provided i18n config file.\n- Analysis the naming rule or file path rule for i18n mapping between different language editions?\n- Base on file lists from user, help analysis the file paths.\n\nFile lists analysis steps:\n- According to naming rule or file path rule for i18n mapping between different language editions.\n- user will provide a list with absolute path, identify if the file is default language file or not.\n- if yes, please answer with translated language file name with absolute path.\n\nQuality assurance steps:\n- Verify you understand i18n config file.\n- Verify you understand the naming rule or file path rule for i18n mapping between different language editions.",
+            }
+        }
+
+        config_path = "config.yaml"
+
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, "r", encoding="utf-8") as f:
+                    return yaml.safe_load(f)
+            else:
+                print(f"配置文件 {config_path} 不存在，使用默认配置")
+                return default_config
+        except Exception as e:
+            print(f"加载配置文件时出错: {e}，使用默认配置")
+            return default_config
 
     # ----------------------
     # 属性访问器 (使用 @property)
@@ -95,7 +125,7 @@ class TranslationContext:
         return self._disclaimers
 
     @property
-    def config(self) -> bool:
+    def config(self) -> dict:
         return self._config
 
     def show_config(self) -> None:

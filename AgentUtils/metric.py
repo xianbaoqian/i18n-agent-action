@@ -68,6 +68,7 @@ class LabeledCounter:
 # 全局计数器实例
 LLM_RESPONSE_TIME = ThreadSafeFloatCounter()
 LLM_TOKENS_USED = LabeledCounter()
+Client_Cache = LabeledCounter()
 
 
 def print_metrics():

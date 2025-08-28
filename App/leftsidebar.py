@@ -18,10 +18,13 @@ class LeftSidebar(ft.Container):
         super().__init__()
         self.app = app
         self.visible = True
-        self.storage = ExpiringDictStorage(expiry_days=7)
+        self.app_data_path = os.getenv("FLET_APP_STORAGE_DATA")
+        self.storage_file_path = os.path.join(self.app_data_path, "data_store.json")
+        self.storage = ExpiringDictStorage(
+            filename=self.storage_file_path, expiry_days=7
+        )
 
         # 获取应用数据存储路径
-        self.app_data_path = os.getenv("FLET_APP_STORAGE_DATA")
         self.config_file_path = os.path.join(self.app_data_path, "app_config.json")
 
         # 获取或创建加密密钥
@@ -293,7 +296,7 @@ class LeftSidebar(ft.Container):
             model=self.model_field.value,
             dryRun=False,
             local_cache=self.storage,
-            usecache=self.save_history_switch.value,
+            usecache=True,
         )
         print(f"自动检测语言: {self.auto_detect_switch.value}")
         print(f"发音功能: {self.pronunciation_switch.value}")

@@ -4,7 +4,7 @@ import time
 
 from openai import OpenAI
 
-from .metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED
+from .metric import LLM_RESPONSE_TIME, LLM_TOKENS_USED, Client_Cache
 
 
 class clientInfo:
@@ -90,8 +90,11 @@ class clientInfo:
             logging.info(f"Checking cache for Messages: {messages}")
             key = hashlib.sha256(str(messages).encode("utf-8")).hexdigest()
             if key in self._local_cache:
+                logging.info("use cache")
+                Client_Cache.labels(type="local_cache_hit").inc(1)
                 return self._local_cache.get(key)
 
+        Client_Cache.labels(type="local_cache_miss").inc(1)
         logging.info(f"Request to LLM - Messages: {messages}")
         if not self._dryRun:
             start_time = time.time()
